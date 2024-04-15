@@ -40,7 +40,7 @@ export default function List() {
                     alt={nft.value.name}
                     width="50px"
                   />
-                  <p> {window.location.origin + "/" + nft.key}</p>
+                  <p> {window.location.origin + "/api/" + nft.key}</p>
 
                   {/* <p> {nft.value.comment ? nft.value.comment.length : 0}</p> */}
                 </div>
