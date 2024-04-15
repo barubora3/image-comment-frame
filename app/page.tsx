@@ -27,10 +27,6 @@ const config = {
   siweUri: "http://localhost:3000",
 };
 
-const formSchema = z.object({
-  username: z.string().min(2).max(50),
-});
-
 export default function Home() {
   return (
     <>
@@ -44,7 +40,7 @@ export default function Home() {
           </div>
 
           <h1 className="py-6 text-2xl font-bold text-center">
-            Image Comment Frame(仮)
+            Degen Comment(仮)
           </h1>
           <RegistForm />
 
@@ -56,8 +52,6 @@ export default function Home() {
 }
 
 import { ZDK, ZDKNetwork, ZDKChain } from "@zoralabs/zdk";
-import { kv } from "@vercel/kv";
-import { base } from "viem/chains";
 import { MediaFetchAgent, Networks } from "@zoralabs/nft-hooks";
 
 const API_ENDPOINT = "https://api.zora.co/graphql";
@@ -67,7 +61,7 @@ function RegistForm() {
   const profile = useProfile();
   const {
     isAuthenticated,
-    profile: { fid, displayName, custody },
+    profile: { fid, displayName, custody, pfpUrl },
   } = profile;
 
   // step1
@@ -186,7 +180,7 @@ function RegistForm() {
     };
 
     const zdk = new ZDK(args); // All arguments
-    const res = await zdk.token({
+    const res: any = await zdk.token({
       token: {
         address: contractAddress,
         tokenId: tokenId,
@@ -204,7 +198,7 @@ function RegistForm() {
 
     const fetchAgent = new MediaFetchAgent(Networks.MAINNET);
     const ipfsHash = res.token?.token?.image?.url?.replace("ipfs://", "");
-    const imageResult = await fetchAgent.fetchContent(
+    const imageResult: any = await fetchAgent.fetchContent(
       // "https://ipfs.io/ipfs/" + ipfsHash,
       "https://ipfs.decentralized-content.com/ipfs/" + ipfsHash,
       "application/json"
@@ -230,6 +224,7 @@ function RegistForm() {
         fid,
         displayName,
         custody,
+        pfpUrl,
       },
       comment: [],
     };

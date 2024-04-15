@@ -24,7 +24,7 @@ export default function List() {
     <>
       <main>
         <h1 className="py-6 text-2xl font-bold text-center">
-          Image Comment Frame(仮)
+          Degen Comment(仮)
         </h1>
         <h2 className="py-6 text-2xl font-bold text-center">
           Registed NFT List
@@ -32,16 +32,17 @@ export default function List() {
         {nftList.length === 0 && <p>There is no registed NFT.</p>}
         {nftList.length > 0 && (
           <>
-            {nftList.map((nft, index) => (
+            {nftList.map((nft: any, index) => (
               <div key={index} className="border border-gray-300 p-4 my-4">
                 <div className="flex">
                   <img
-                    src={nft.value.image}
+                    src={nft?.value?.image || ""}
                     alt={nft.value.name}
                     width="50px"
                   />
-                  <p> {nft.key}</p>
-                  <p> {nft.value.comment ? nft.value.comment.length : 0}</p>
+                  <p> {window.location.origin + "/" + nft.key}</p>
+
+                  {/* <p> {nft.value.comment ? nft.value.comment.length : 0}</p> */}
                 </div>
               </div>
             ))}

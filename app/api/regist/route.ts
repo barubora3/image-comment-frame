@@ -1,4 +1,4 @@
-import { db } from "../../../lib/firebase";
+import { db } from "../../../src/lib/firebase";
 import { NextRequest, NextResponse } from "next/server";
 
 interface StoreDataRequest {
