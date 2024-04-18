@@ -7,6 +7,11 @@ import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
 import { db } from "@/lib/firebase";
 import { createSystem } from "frog/ui";
+import { textColors, textSizes } from "../../utils/text";
+const options = {
+  method: "GET",
+  headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
+};
 
 const { Box, Image, VStack, Heading, Text } = createSystem({
   colors: {
@@ -24,7 +29,7 @@ const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
   // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
+  // hub: neynar({ apiKey: process.env.NEYNAR_API_KEY! }),
   headers: {
     "cache-control": "max-age=0",
   },
@@ -36,7 +41,6 @@ const app = new Frog({
 app.frame("/:id", async (c) => {
   const { buttonValue, inputText, status, req, url, frameData } = c;
 
-  console.log(frameData);
   const id = req.param("id");
 
   const dbRef = db.ref(id);
@@ -90,15 +94,28 @@ app.frame("/:id", async (c) => {
   let comment = data.comment || [];
 
   if (inputText && buttonValue === "doComment") {
+    const userInfo = await fetch(
+      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${frameData?.fid}&viewer_fid=3`,
+      options
+    );
+    const userData = await userInfo.json();
+    console.log(userData);
+    const pfpUrl = userData.users[0].pfp_url;
+    const displayName = userData.users[0].display_name;
+
     const commentObject = {
       message: inputText,
-
       left: Math.floor(Math.random() * 100),
       top: Math.floor(Math.random() * 100),
+      color: textColors[Math.floor(Math.random() * textColors.length)],
+      size: textSizes,
+      profile: {
+        fid: frameData?.fid,
+        displayName: displayName,
+        pfpUrl: pfpUrl,
+      },
 
-      fid: frameData?.fid,
-
-      createAt: frameData?.timestamp || new Date().toISOString,
+      createAt: frameData?.timestamp,
     };
 
     comment.push(commentObject);
@@ -114,14 +131,16 @@ app.frame("/:id", async (c) => {
     image: (
       <Box grow alignHorizontal="center" backgroundColor="black" width="100%">
         <Image src={image} objectFit="cover" height="100%" />
+
         {comment.map((com: any, index: number) => (
           <div
             style={{
-              color: "white",
+              color: com.color || "white",
               position: "absolute",
-              fontSize: 50,
+              fontSize: com.size || textSizes,
               top: com.top + "%",
               left: com.left + "%",
+              whiteSpace: "nowrap",
             }}
             key={index}
           >
@@ -135,8 +154,11 @@ app.frame("/:id", async (c) => {
       <Button key="commentButton" value="doComment">
         Comment
       </Button>,
-      <Button.Link key="superComment" href={url.replace(/\/api\/.*/, "")}>
-        Super Comment(未実装)
+      <Button.Link
+        key="superComment"
+        href={url.replace(/\/api\/.*/, "/comment/" + id)}
+      >
+        Super Comment
       </Button.Link>,
       <Button.Link key="regist" href={url.replace(/\/api\/.*/, "")}>
         Other

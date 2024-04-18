@@ -36,3 +36,7 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+.env
+
+image-comment-frame-firebase-adminsdk-m0gru-911cccd523.json

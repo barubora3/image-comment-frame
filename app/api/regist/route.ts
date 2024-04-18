@@ -23,6 +23,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (value.creator === undefined) {
+      console.log("creator is undefined");
+      return NextResponse.json(
+        { message: "Creator is not found !" },
+        { status: 200 }
+      );
+    }
+
     const data = {
       contractAddress: value.contractAddress,
       tokenId: value.tokenId,
@@ -32,6 +40,7 @@ export async function POST(req: NextRequest) {
       createAt: value.createAt,
       registor: value.registor || {},
       comment: value.comment || [],
+      creator: value.creator,
     };
 
     console.log(data);
