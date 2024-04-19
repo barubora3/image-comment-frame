@@ -9,8 +9,8 @@ const config = {
   relay: "https://relay.farcaster.xyz",
   rpcUrl:
     "https://opt-mainnet.g.alchemy.com/v2/cpuacOtw2fy6itWrjMMtoSxqwdAdI1v6",
-  domain: "localhost:3000",
-  siweUri: "http://localhost:3000",
+  domain: process.env.NEXT_PUBLIC_DOMAIN!,
+  siweUri: process.env.NEXT_PUBLIC_SIWE_URI!,
 };
 export function Providers({ children }: { children: ReactNode }) {
   return (
