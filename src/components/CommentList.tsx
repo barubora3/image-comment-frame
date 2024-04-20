@@ -16,7 +16,7 @@ const CommentList = ({ comments }: { comments: any[] }) => {
       <h2 className="text-white text-lg font-bold pb-2 text-center md:text-left">
         Comment
       </h2>
-      <Card className=" h-full overflow-y-auto bg-gray-700 border-none w-auto">
+      <Card className="h-96 lg:h-[calc(100vh-200px)] overflow-y-auto bg-gray-700 border-none w-auto">
         <CardContent className="py-2 px-4">
           {comments.map((comment, index) => (
             <>

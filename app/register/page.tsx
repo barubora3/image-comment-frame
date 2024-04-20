@@ -265,7 +265,7 @@ function RegistForm() {
   };
 
   return (
-    <div className="flex justify-center items-center  ">
+    <div className="flex justify-center items-center px-4 md:px-0 ">
       {currentStep === 0 && (
         <div className="w-full max-w-2xl pt-10">
           <div className="bg-white p-8 rounded-lg shadow-xl  ">

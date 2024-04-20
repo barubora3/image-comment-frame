@@ -99,6 +99,7 @@ app.frame("/:id", async (c) => {
   }
   const data = await snapshot.val();
   const image = data.image;
+  const name = data.name;
   let comment = data.comment || [];
 
   if (inputText && buttonValue === "doComment") {
@@ -113,8 +114,8 @@ app.frame("/:id", async (c) => {
 
     const commentObject = {
       message: inputText,
-      left: Math.floor(Math.random() * 100),
-      top: Math.floor(Math.random() * 100),
+      left: Math.floor(Math.random() * 90),
+      top: Math.floor(Math.random() * 90),
       color: textColors[Math.floor(Math.random() * textColors.length)],
       size: textSizes,
       profile: {
@@ -151,6 +152,20 @@ app.frame("/:id", async (c) => {
           }}
         >
           <Image src={image} objectFit="cover" height="100%" />
+          {/* NFT名 */}
+          <div
+            style={{
+              color: "white",
+              fontSize: 60,
+              position: "absolute",
+              top: 0,
+              left: 0,
+              background: "rgba(255, 255, 255, 0.4)",
+              padding: "4px 8px",
+            }}
+          >
+            {name}
+          </div>
           {comment.map((com: any, index: number) => {
             const fontSize = com.size || textSizes;
             const top = com.top + "%";

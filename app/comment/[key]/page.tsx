@@ -28,6 +28,7 @@ import CommentList from "../../../src/components/CommentList";
 import { authAtom } from "../../atoms/authAtom";
 import { useSetAtom, useAtomValue } from "jotai";
 import { shareUrlBase, embedParam } from "../../utils/url";
+import { randomCommentList } from "../../utils/randomComments";
 
 // share url
 // https://warpcast.com/~/compose?text=Mint%20Untitiled%20for%20free%20%E2%9C%A8%0A%0Ahttps%3A%2F%2Ffar.quest%2Fcontracts%2Fdegen%2Funtitiled-79&embeds[]=https://far.quest/contracts/degen/untitiled-79&rand=0.92291
@@ -49,13 +50,14 @@ export default function Home() {
   const [superComment, setSuperComment] = useState({
     text: "",
     color: "#000000",
-    size: 30,
+    size: 50,
     left: 0,
-    top: 0,
+    top: 20,
   });
 
   const [comments, setComments] = useState<any>([]);
   const [imageUrl, setImageUrl] = useState("");
+  const [isImageLoading, setIsImageLoading] = useState(true);
 
   const setAuthState = useSetAtom(authAtom);
   const authState = useAtomValue(authAtom);
@@ -74,43 +76,46 @@ export default function Home() {
   }, [isAuthenticated, fid]);
 
   useEffect(() => {
-    console.log(authState);
-    const fetchData = async () => {
-      // frogのapiを叩く
-      const frogRes = await fetch(`/api/${key}`);
-      // console.log(response);
-      // const data = await response.json();
-      // console.log(data);
-
-      // DBから取得
-      const response = await fetch(`/api/get?key=${key}`);
-
-      const data = await response.json();
-      setComments(data.data.comment || []);
-
-      // 画像を取得
-      const requestOptions = {
-        method: "GET",
-        headers: {
-          "User-Agent": navigator.userAgent,
-          Referer: document.location.href,
-        },
-        credentials: "include" as RequestCredentials,
-      };
-      // const imageRes = await fetch(`/api/${key}/image`, requestOptions);
-      const imageRes = await fetch(`/api/${key}/image`, requestOptions);
-      const imageBlob = await imageRes.blob();
-      const imageUrl = URL.createObjectURL(imageBlob);
-      setImageUrl(imageUrl);
-
-      setIsLoading(false);
-    };
     fetchData();
   }, [key]);
 
+  const fetchData = async () => {
+    // frogのapiを叩く
+    // const frogRes = await fetch(`/api/${key}`);
+
+    // DBから取得
+    const response = await fetch(`/api/get?key=${key}`);
+    const data = await response.json();
+    setComments(data.data.comment || []);
+
+    setIsLoading(false);
+
+    // const imageRes = await fetch(`/api/${key}/image`, requestOptions);
+    imageLoad();
+  };
+
+  const imageLoad = async () => {
+    // 画像を取得
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "User-Agent": navigator.userAgent,
+        Referer: document.location.href,
+      },
+      credentials: "include" as RequestCredentials,
+    };
+    setIsImageLoading(true);
+    const imageRes = await fetch(`/api/${key}/image`, requestOptions);
+    const imageBlob = await imageRes.blob();
+    const imageUrl = URL.createObjectURL(imageBlob);
+    setImageUrl(imageUrl);
+    setIsImageLoading(false);
+  };
+
   const handleFreeCommentSubmit = async () => {
-    if (freeComment.length > 10) {
-      toast.error("Comments are limited to 10 characters.");
+    const textLimit = 20;
+    if (freeComment.length > textLimit) {
+      toast.error(`Comments are limited to ${textLimit} characters.`);
       return;
     }
     try {
@@ -136,8 +141,9 @@ export default function Home() {
       });
       if (response.ok) {
         toast.success("Comment posted successfully !");
-        location.reload();
+        // location.reload();
         setFreeComment("");
+        fetchData();
       } else {
         toast.error("Failed to post the comment.");
       }
@@ -226,6 +232,11 @@ export default function Home() {
     }
   };
 
+  const generateRandomComment = () => {
+    const randomIndex = Math.floor(Math.random() * randomCommentList.length);
+    return randomCommentList[randomIndex];
+  };
+
   const RandomButton = ({ setSuperComment }: { setSuperComment: any }) => {
     // ランダムな値を生成するヘルパー関数
     const generateRandomValue = (min: number, max: number) => {
@@ -251,7 +262,7 @@ export default function Home() {
     };
 
     return (
-      <Button variant={"custom"} onClick={handleRandomize}>
+      <Button variant={"custom"} onClick={handleRandomize} className="px-2.5">
         Randomize
       </Button>
     );
@@ -284,14 +295,24 @@ export default function Home() {
             </div>
           </div>
           <CommentList comments={comments} /> */}
-          <div className=" w-[100vw]">
+          <div className="w-[100vw]">
             <div
               className="mx-auto max-w-2xl text-center relative"
               style={{ overflow: "hidden" }}
             >
-              {/* <img src={`/api/${key}/image`} alt="Image" className="mx-auto" /> */}
-              <img src={imageUrl} alt="Image" className="mx-auto" />
-
+              <div className="h-[360px] flex items-center justify-center">
+                {isImageLoading && (
+                  <div className="text-center">
+                    <img
+                      src="/loadingClock.gif"
+                      className="w-20 h-20 mx-auto"
+                    />
+                  </div>
+                )}
+                {!isImageLoading && (
+                  <img src={imageUrl} alt="Image" className="mx-auto" />
+                )}
+              </div>
               <div
                 style={{
                   // color: superComment.color || "white",
@@ -374,60 +395,68 @@ export default function Home() {
               </div>
             )}
             {authState && (
-              <div className="flex justify-center item-center">
+              <div className="flex justify-center item-center px-4 md:px-0">
                 <Accordion
                   type="single"
                   collapsible
-                  className="w-full md:w-[800px]"
+                  className="w-full xl:w-[600px]"
                 >
                   <AccordionItem value="item-1">
                     <AccordionTrigger>
-                      <div className="text-xl font-bold text-white ">
+                      <div className="text-xl font-bold text-white">
                         Free Comment
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex">
-                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                      <div className="flex flex-col md:flex-row gap-4 ">
+                        <div className="grid w-full lg:max-w-[352px] items-center gap-1.5">
                           <Label className="text-white font-bold text-left">
                             Comment
                           </Label>
                           <Input
                             type="text"
-                            className="border border-gray-300 rounded-l px-2 py-1"
-                            placeholder="Enter a comment (10 characters or less)"
+                            className="border border-gray-300 rounded-l py-1 w-full"
+                            placeholder="Enter a comment)"
                             value={freeComment}
                             onChange={(e) => setFreeComment(e.target.value)}
                             maxLength={10}
                           />
                         </div>
-                        <div className="px-2" />
-                        <div className="grid items-center gap-1.5">
-                          <Label></Label>
+
+                        <div className="grid items-center gap-1.5 ">
+                          <Label className="text-white text-left ">
+                            Random Comment
+                          </Label>
                           <Button
                             variant={"custom"}
-                            onClick={handleFreeCommentSubmit}
+                            onClick={() =>
+                              setFreeComment(generateRandomComment())
+                            }
                           >
-                            Submit
+                            Generate
                           </Button>
                         </div>
                       </div>
-                      <div className="text-white pt-4 text-left">
-                        no preview
+                      <div className="grid items-center xl:justify-center pt-4">
+                        <Button
+                          variant={"custom"}
+                          onClick={handleFreeCommentSubmit}
+                          className="w-full xl:w-40"
+                        >
+                          Submit
+                        </Button>
                       </div>
                     </AccordionContent>
                   </AccordionItem>
                   <AccordionItem value="item-2">
                     <AccordionTrigger>
-                      <div className="text-xl font-bold text-white ">
+                      <div className="text-xl font-bold text-white">
                         Super Comment
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      {/* ランダムボタンの追加 */}
-
-                      <div className="flex">
-                        <div className="grid w-full max-w-xs items-center gap-1.5">
+                      <div className="flex flex-col md:flex-row gap-4">
+                        <div className="grid w-full lg:max-w-[352px] items-center gap-1.5">
                           <Label className="text-white font-bold text-left">
                             Comment
                           </Label>
@@ -445,38 +474,26 @@ export default function Home() {
                           />
                         </div>
 
-                        <div className="px-2" />
-                        {/* 
-                    <select
-                      id="colorSelect"
-                      onChange={(e) =>
-                        setSuperComment({
-                          ...superComment,
-                          color: e.target.value,
-                        })
-                      }
-                    >
-                      {textColors.map((color, index) => (
-                        <option key={index} value={color}>
-                          <div
-                            style={{ display: "flex", alignItems: "center" }}
+                        <div className="grid items-center gap-1.5 ">
+                          <Label className="text-white text-left">
+                            Random Comment
+                          </Label>
+                          <Button
+                            variant={"custom"}
+                            onClick={() => {
+                              const newComment = generateRandomComment() || "";
+                              setSuperComment({
+                                ...superComment,
+                                text: newComment,
+                              });
+                            }}
                           >
-                            <span
-                              style={{
-                                width: "16px",
-                                height: "16px",
-                                backgroundColor: color,
-                                marginRight: "8px",
-                              }}
-                            >
-                              {color}
-                            </span>
-                          </div>
-                        </option>
-                      ))}
-                    </select> */}
-
-                        <div className="grid max-w-sm items-center gap-1.5">
+                            Generate
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col md:flex-row gap-4 pt-4">
+                        <div className="grid items-center gap-1.5">
                           <Label className="text-white font-bold text-left">
                             Color
                           </Label>
@@ -492,9 +509,7 @@ export default function Home() {
                             }
                           />
                         </div>
-
-                        <div className="px-2" />
-                        <div className="grid max-w-sm items-center gap-1.5">
+                        <div className="grid items-center gap-1.5">
                           <Label className="text-white font-bold text-left">
                             Size
                           </Label>
@@ -513,9 +528,7 @@ export default function Home() {
                             }
                           />
                         </div>
-
-                        <div className="px-2" />
-                        <div className="grid max-w-sm items-center gap-1.5">
+                        <div className="grid items-center gap-1.5">
                           <Label className="text-white font-bold text-left">
                             X
                           </Label>
@@ -534,9 +547,7 @@ export default function Home() {
                             }
                           />
                         </div>
-
-                        <div className="px-2" />
-                        <div className="grid max-w-sm items-center gap-1.5">
+                        <div className="grid items-center gap-1.5">
                           <Label className="text-white font-bold text-left">
                             Y
                           </Label>
@@ -555,13 +566,12 @@ export default function Home() {
                             }
                           />
                         </div>
-                        <div className="px-2" />
                         <div className="grid items-center gap-1.5">
                           <Label></Label>
                           <RandomButton setSuperComment={setSuperComment} />
                         </div>
                       </div>
-                      <div className="grid items-center pt-4">
+                      <div className="grid items-center xl:justify-center pt-4">
                         <Label></Label>
                         <Button
                           variant={"custom"}

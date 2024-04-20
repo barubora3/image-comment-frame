@@ -30,8 +30,9 @@ export async function POST(req: Request) {
     message: newComment,
     color: textColors[Math.floor(Math.random() * textColors.length)],
     size: textSizes,
-    left: Math.floor(Math.random() * 100),
-    top: Math.floor(Math.random() * 100),
+    // 100になると何も見えなくなるので上限を100より小さめに指定
+    left: Math.floor(Math.random() * 90),
+    top: Math.floor(Math.random() * 90),
     profile: profile,
     createAt: unixTimeMs,
   };
