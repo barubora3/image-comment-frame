@@ -7,7 +7,7 @@ import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
 import { db } from "@/lib/firebase";
 import { createSystem } from "frog/ui";
-import { textColors, textSizes } from "../../utils/text";
+import { textColors, textSizes, textColorCodes } from "../../utils/text";
 const options = {
   method: "GET",
   headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
@@ -149,26 +149,34 @@ app.frame("/:id", async (c) => {
           }}
         >
           <Image src={image} objectFit="cover" height="100%" />
-          {comment.map((com: any, index: number) => (
-            <div
-              style={{
-                color: "white",
-                position: "absolute",
-                fontSize: com.size || textSizes,
-                top: com.top + "%",
-                left: com.left + "%",
-                whiteSpace: "nowrap",
-                textShadow: `${textOutline1} ${
-                  com?.color || "black"
-                }, ${textOutline2} ${com?.color || "black"}, ${textOutline3} ${
-                  com?.color || "black"
-                }, ${textOutline4} ${com?.color || "black"}`,
-              }}
-              key={index}
-            >
-              {com.message}
-            </div>
-          ))}
+          {comment.map((com: any, index: number) => {
+            const fontSize = com.size || textSizes;
+            const top = com.top + "%";
+            const left = com.left + "%";
+            const color = com?.color?.startsWith("#")
+              ? com.color
+              : textColorCodes[com.color as keyof typeof textColorCodes] ||
+                "black";
+            const textShadow = `${textOutline1} ${color}, ${textOutline2} ${color}, ${textOutline3} ${color}, ${textOutline4} ${color}`;
+            const message = com.message || "";
+
+            return (
+              <div
+                style={{
+                  color: "white",
+                  position: "absolute",
+                  fontSize,
+                  top,
+                  left,
+                  whiteSpace: "nowrap",
+                  textShadow,
+                }}
+                key={index}
+              >
+                {message}
+              </div>
+            );
+          })}
         </span>
       </Box>
     ),

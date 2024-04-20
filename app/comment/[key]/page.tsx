@@ -83,8 +83,9 @@ export default function Home() {
 
       // DBから取得
       const response = await fetch(`/api/get?key=${key}`);
+
       const data = await response.json();
-      setComments(data.data.comment);
+      setComments(data.data.comment || []);
 
       // 画像を取得
       const requestOptions = {
