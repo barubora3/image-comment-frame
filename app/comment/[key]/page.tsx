@@ -76,7 +76,7 @@ export default function Home() {
     console.log(authState);
     const fetchData = async () => {
       // frogのapiを叩く
-      // const response = await fetch(`/api/${key}`);
+      const response = await fetch(`/api/${key}`);
       // console.log(response);
       // const data = await response.json();
       // console.log(data);
