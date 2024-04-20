@@ -1,10 +1,9 @@
 "use client";
-
 import { SignInButton } from "@farcaster/auth-kit";
 
 export const Header = () => {
   return (
-    <header className=" text-white">
+    <header className="text-white">
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
           <div></div>
@@ -16,7 +15,7 @@ export const Header = () => {
           </div>
         </div>
         <nav className="mt-6">
-          <ul className="flex flex-col items-center space-y-2 md:flex-row md:justify-center md:space-x-4 md:space-y-0">
+          <ul className="flex flex-wrap justify-center space-x-4">
             <li>
               <a
                 href="/register"
