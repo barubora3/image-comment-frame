@@ -51,10 +51,12 @@ export async function POST(req: Request) {
   console.log(userData);
   const pfpUrl = userData.users[0].pfp_url;
   const displayName = userData.users[0].display_name;
+  const userName = userData.users[0].username;
 
   const profile = {
     fid,
     displayName,
+    userName: userName,
     pfpUrl,
   };
 
@@ -73,6 +75,7 @@ export async function POST(req: Request) {
     top,
     color,
     profile,
+    isSuperComment: true,
     createAt: unixTimeMs,
   };
 

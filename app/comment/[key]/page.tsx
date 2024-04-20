@@ -24,6 +24,13 @@ import {
 import ABI from "../../utils/abi.json";
 import { textColors } from "../../utils/text";
 import { SignInButton } from "@farcaster/auth-kit";
+import CommentList from "../../../src/components/CommentList";
+import { authAtom } from "../../atoms/authAtom";
+import { useSetAtom, useAtomValue } from "jotai";
+import { shareUrlBase, embedParam } from "../../utils/url";
+
+// share url
+// https://warpcast.com/~/compose?text=Mint%20Untitiled%20for%20free%20%E2%9C%A8%0A%0Ahttps%3A%2F%2Ffar.quest%2Fcontracts%2Fdegen%2Funtitiled-79&embeds[]=https://far.quest/contracts/degen/untitiled-79&rand=0.92291
 
 export default function Home() {
   const params = useParams();
@@ -32,7 +39,7 @@ export default function Home() {
 
   const {
     isAuthenticated,
-    profile: { fid, displayName, custody, pfpUrl },
+    profile: { fid, displayName, custody, pfpUrl, username },
   } = profile;
 
   const [data, setData] = useState<any>(null);
@@ -47,9 +54,39 @@ export default function Home() {
     top: 0,
   });
 
+  const [comments, setComments] = useState<any>([]);
+
+  const setAuthState = useSetAtom(authAtom);
+  const authState = useAtomValue(authAtom);
+
   useEffect(() => {
+    // ログインしたらjotaiに情報を書きこむ
+    if (isAuthenticated && fid) {
+      console.log("logged in");
+      setAuthState({
+        fid,
+        displayName,
+        pfpUrl,
+        username,
+      });
+    }
+  }, [isAuthenticated, fid]);
+
+  useEffect(() => {
+    console.log(authState);
     const fetchData = async () => {
-      const response = await fetch(`/api/${key}`);
+      // frogのapiを叩く
+      // const response = await fetch(`/api/${key}`);
+      // console.log(response);
+      // const data = await response.json();
+      // console.log(data);
+
+      // DBから取得
+      const response = await fetch(`/api/get?key=${key}`);
+      const data = await response.json();
+      setComments(data.data.comment);
+
+      // 画像を取得
       const requestOptions = {
         method: "GET",
         headers: {
@@ -58,7 +95,8 @@ export default function Home() {
         },
         credentials: "include" as RequestCredentials,
       };
-      const imageRes = await fetch(`/api/${key}/image`, requestOptions);
+      // const imageRes = await fetch(`/api/${key}/image`, requestOptions);
+      const imageRes = fetch(`/api/${key}/image`, requestOptions);
       console.log(imageRes);
       setIsLoading(false);
     };
@@ -79,7 +117,16 @@ export default function Home() {
         body: JSON.stringify({
           comment: freeComment,
           key: key,
-          profile: { fid: fid, displayName: displayName, pfpUrl: pfpUrl },
+          profile: {
+            // fid: fid,
+            // displayName: displayName,
+            // pfpUrl: pfpUrl,
+            // userName: username,
+            fid: authState?.fid || fid,
+            displayName: authState?.displayName || displayName,
+            pfpUrl: authState?.pfpUrl || pfpUrl,
+            userName: authState?.username || username,
+          },
         }),
       });
       if (response.ok) {
@@ -137,7 +184,7 @@ export default function Home() {
 
       tx = await contract.addComment(
         key,
-        fid,
+        authState?.fid || fid,
         superComment.text,
         superComment.size,
         superComment.color,
@@ -162,13 +209,8 @@ export default function Home() {
         });
 
         toast.success("Super comment posted successfully !");
-        setSuperComment({
-          text: "",
-          color: "#000000",
-          size: 30,
-          left: 0,
-          top: 0,
-        });
+        setIsLoading(true);
+
         location.reload();
       } else {
         toast.error("Failed to post the super comment.");
@@ -217,8 +259,8 @@ export default function Home() {
   return (
     <>
       <div className="flex justify-center items-center ">
-        <div className="w-[800px]">
-          <div
+        <div className="relative">
+          {/* <div
             className="w-full text-center relative"
             style={{ overflow: "hidden" }}
           >
@@ -236,10 +278,63 @@ export default function Home() {
               {superComment.text}
             </div>
           </div>
-          <div className="mt-4">
-            <div className="text-white text-center">
-              <div className="font-bold text-lg pb-1">Frame URL</div>
+          <CommentList comments={comments} /> */}
+          <div className=" w-[100vw]">
+            <div
+              className="mx-auto max-w-2xl text-center relative"
+              style={{ overflow: "hidden" }}
+            >
+              <img src={`/api/${key}/image`} alt="Image" className="mx-auto" />
               <div
+                style={{
+                  // color: superComment.color || "white",
+                  color: "white",
+                  position: "absolute",
+                  fontSize: superComment.size + "px",
+                  top: superComment.top + "%",
+                  left: superComment.left + "%",
+                  whiteSpace: "nowrap",
+                  textShadow: `1px 1px 0 ${superComment.color}, -1px 1px 0 ${superComment.color}, 1px -1px 0 ${superComment.color}, -1px -1px 0 ${superComment.color}`,
+                }}
+              >
+                {superComment.text}
+              </div>
+            </div>
+            <div className="absolute top-0 right-0 -mt-8 mr-10 2xl:mr-40">
+              <CommentList comments={comments || []} />
+            </div>
+          </div>
+
+          <div className="mt-4 text-center ">
+            <div className="flex justify-center pt-4">
+              {/* <div className="font-bold text-lg pb-1">Share Frame</div> */}
+
+              <Button
+                onClick={() => {
+                  window.open(
+                    `${shareUrlBase}Degen Comment🚀${window.location.origin}/comment/${key}${embedParam}${window.location.origin}/api/${key}`,
+                    "_blank"
+                  );
+                }}
+              >
+                Share Frame
+              </Button>
+              <div className="px-2" />
+
+              <Button
+                onClick={() => {
+                  window.open(
+                    `https://zora.co/collect/${key.replace(
+                      /:(?=[^:]*$)/,
+                      "/"
+                    )}`,
+                    "_blank"
+                  );
+                }}
+              >
+                View on Zora
+              </Button>
+              {/* <div
                 className=" break-all cursor-pointer"
                 onClick={() => {
                   navigator.clipboard.writeText(
@@ -249,7 +344,7 @@ export default function Home() {
                 }}
               >
                 {window.location.origin + "/api/" + key}
-              </div>
+              </div> */}
             </div>
             {/*
             <div className="text-white text-center pt-2">
@@ -259,77 +354,84 @@ export default function Home() {
               </div>
             </div>
              */}
-            {!isAuthenticated && (
+            {!authState && (
               <div className="flex justify-center items-center flex-col">
-                <div className="text-center text-white pt-10 text-xl pb-10">
-                  Please login to comment!!
+                <div className="text-center text-white pt-8 pb-4 text-xl">
+                  Please sign in to comment !
                 </div>
                 <SignInButton />
               </div>
             )}
-            {isAuthenticated && (
-              <Accordion type="single" collapsible>
-                <AccordionItem value="item-1">
-                  <AccordionTrigger>
-                    <div className="text-xl font-bold text-white ">
-                      Free Comment
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex">
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className="text-white font-bold">Comment</Label>
-                        <Input
-                          type="text"
-                          className="border border-gray-300 rounded-l px-2 py-1"
-                          placeholder="Enter a comment (10 characters or less)"
-                          value={freeComment}
-                          onChange={(e) => setFreeComment(e.target.value)}
-                          maxLength={10}
-                        />
+            {authState && (
+              <div className="flex justify-center item-center">
+                <Accordion type="single" collapsible className="w-[800px]">
+                  <AccordionItem value="item-1">
+                    <AccordionTrigger>
+                      <div className="text-xl font-bold text-white ">
+                        Free Comment
                       </div>
-                      <div className="px-2" />
-                      <div className="grid items-center gap-1.5">
-                        <Label></Label>
-                        <Button
-                          variant={"custom"}
-                          onClick={handleFreeCommentSubmit}
-                        >
-                          Submit
-                        </Button>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex">
+                        <div className="grid w-full max-w-sm items-center gap-1.5">
+                          <Label className="text-white font-bold text-left">
+                            Comment
+                          </Label>
+                          <Input
+                            type="text"
+                            className="border border-gray-300 rounded-l px-2 py-1"
+                            placeholder="Enter a comment (10 characters or less)"
+                            value={freeComment}
+                            onChange={(e) => setFreeComment(e.target.value)}
+                            maxLength={10}
+                          />
+                        </div>
+                        <div className="px-2" />
+                        <div className="grid items-center gap-1.5">
+                          <Label></Label>
+                          <Button
+                            variant={"custom"}
+                            onClick={handleFreeCommentSubmit}
+                          >
+                            Submit
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                    <div className="text-white pt-4">no preview</div>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-2">
-                  <AccordionTrigger>
-                    <div className="text-xl font-bold text-white ">
-                      Super Comment
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    {/* ランダムボタンの追加 */}
+                      <div className="text-white pt-4 text-left">
+                        no preview
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="item-2">
+                    <AccordionTrigger>
+                      <div className="text-xl font-bold text-white ">
+                        Super Comment
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      {/* ランダムボタンの追加 */}
 
-                    <div className="flex">
-                      <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label className="text-white font-bold">Comment</Label>
-                        <Input
-                          type="text"
-                          className="border border-gray-300 rounded-l px-2 py-1"
-                          placeholder="Enter a comment"
-                          value={superComment.text}
-                          onChange={(e) =>
-                            setSuperComment({
-                              ...superComment,
-                              text: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
+                      <div className="flex">
+                        <div className="grid w-full max-w-xs items-center gap-1.5">
+                          <Label className="text-white font-bold text-left">
+                            Comment
+                          </Label>
+                          <Input
+                            type="text"
+                            className="border border-gray-300 rounded-l px-2 py-1"
+                            placeholder="Enter a comment"
+                            value={superComment.text}
+                            onChange={(e) =>
+                              setSuperComment({
+                                ...superComment,
+                                text: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
 
-                      <div className="px-2" />
-                      {/* 
+                        <div className="px-2" />
+                        {/* 
                     <select
                       id="colorSelect"
                       onChange={(e) =>
@@ -359,95 +461,104 @@ export default function Home() {
                       ))}
                     </select> */}
 
-                      <div className="grid max-w-sm items-center gap-1.5">
-                        <Label className="text-white font-bold">Color</Label>
-                        <Input
-                          type="color"
-                          className="border border-gray-300 px-2 py-1 w-16"
-                          value={superComment.color}
-                          onChange={(e) =>
-                            setSuperComment({
-                              ...superComment,
-                              color: e.target.value,
-                            })
-                          }
-                        />
-                      </div>
+                        <div className="grid max-w-sm items-center gap-1.5">
+                          <Label className="text-white font-bold text-left">
+                            Color
+                          </Label>
+                          <Input
+                            type="color"
+                            className="border border-gray-300 px-2 py-1 w-16"
+                            value={superComment.color}
+                            onChange={(e) =>
+                              setSuperComment({
+                                ...superComment,
+                                color: e.target.value,
+                              })
+                            }
+                          />
+                        </div>
 
-                      <div className="px-2" />
-                      <div className="grid max-w-sm items-center gap-1.5">
-                        <Label className="text-white font-bold">Size</Label>
-                        <Input
-                          type="number"
-                          className="border border-gray-300 rounded-r px-2 py-1"
-                          placeholder="サイズ"
-                          min="12"
-                          max="80"
-                          value={superComment.size}
-                          onChange={(e) =>
-                            setSuperComment({
-                              ...superComment,
-                              size: parseInt(e.target.value),
-                            })
-                          }
-                        />
-                      </div>
+                        <div className="px-2" />
+                        <div className="grid max-w-sm items-center gap-1.5">
+                          <Label className="text-white font-bold text-left">
+                            Size
+                          </Label>
+                          <Input
+                            type="number"
+                            className="border border-gray-300 rounded-r px-2 py-1"
+                            placeholder="サイズ"
+                            min="12"
+                            max="80"
+                            value={superComment.size}
+                            onChange={(e) =>
+                              setSuperComment({
+                                ...superComment,
+                                size: parseInt(e.target.value),
+                              })
+                            }
+                          />
+                        </div>
 
-                      <div className="px-2" />
-                      <div className="grid max-w-sm items-center gap-1.5">
-                        <Label className="text-white font-bold">X</Label>
-                        <Input
-                          type="number"
-                          className="border border-gray-300 rounded-r px-2 py-1"
-                          placeholder="サイズ"
-                          min="0"
-                          max="99"
-                          value={superComment.left}
-                          onChange={(e) =>
-                            setSuperComment({
-                              ...superComment,
-                              left: parseInt(e.target.value),
-                            })
-                          }
-                        />
-                      </div>
+                        <div className="px-2" />
+                        <div className="grid max-w-sm items-center gap-1.5">
+                          <Label className="text-white font-bold text-left">
+                            X
+                          </Label>
+                          <Input
+                            type="number"
+                            className="border border-gray-300 rounded-r px-2 py-1"
+                            placeholder="サイズ"
+                            min="0"
+                            max="99"
+                            value={superComment.left}
+                            onChange={(e) =>
+                              setSuperComment({
+                                ...superComment,
+                                left: parseInt(e.target.value),
+                              })
+                            }
+                          />
+                        </div>
 
-                      <div className="px-2" />
-                      <div className="grid max-w-sm items-center gap-1.5">
-                        <Label className="text-white font-bold">Y</Label>
-                        <Input
-                          type="number"
-                          className="border border-gray-300 rounded-r px-2 py-1"
-                          placeholder="サイズ"
-                          min="0"
-                          max="99"
-                          value={superComment.top}
-                          onChange={(e) =>
-                            setSuperComment({
-                              ...superComment,
-                              top: parseInt(e.target.value),
-                            })
-                          }
-                        />
+                        <div className="px-2" />
+                        <div className="grid max-w-sm items-center gap-1.5">
+                          <Label className="text-white font-bold text-left">
+                            Y
+                          </Label>
+                          <Input
+                            type="number"
+                            className="border border-gray-300 rounded-r px-2 py-1"
+                            placeholder="サイズ"
+                            min="0"
+                            max="99"
+                            value={superComment.top}
+                            onChange={(e) =>
+                              setSuperComment({
+                                ...superComment,
+                                top: parseInt(e.target.value),
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="px-2" />
+                        <div className="grid items-center gap-1.5">
+                          <Label></Label>
+                          <RandomButton setSuperComment={setSuperComment} />
+                        </div>
                       </div>
-                      <div className="px-2" />
-                      <div className="grid items-center gap-1.5">
+                      <div className="grid items-center pt-4">
                         <Label></Label>
-                        <RandomButton setSuperComment={setSuperComment} />
+                        <Button
+                          variant={"custom"}
+                          onClick={handlesuperCommentSubmit}
+                        >
+                          Submit
+                        </Button>
                       </div>
-                    </div>
-                    <div className="grid items-center pt-4">
-                      <Label></Label>
-                      <Button
-                        variant={"custom"}
-                        onClick={handlesuperCommentSubmit}
-                      >
-                        Submit
-                      </Button>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
             )}
           </div>
         </div>

@@ -17,6 +17,7 @@ const { Box, Image, VStack, Heading, Text } = createSystem({
   colors: {
     white: "#fff",
     black: "#000",
+    background: "#000000",
   },
   fontSizes: {
     small: 0.01,
@@ -24,6 +25,12 @@ const { Box, Image, VStack, Heading, Text } = createSystem({
     large: 0.03,
   },
 });
+
+const textOutlineSize = "1px";
+const textOutline1 = `${textOutlineSize} ${textOutlineSize} 0`;
+const textOutline2 = `-${textOutlineSize} ${textOutlineSize} 0`;
+const textOutline3 = `-${textOutlineSize} -${textOutlineSize} 0`;
+const textOutline4 = `${textOutlineSize} -${textOutlineSize} 0`;
 
 const app = new Frog({
   assetsPath: "/",
@@ -99,9 +106,9 @@ app.frame("/:id", async (c) => {
       options
     );
     const userData = await userInfo.json();
-    console.log(userData);
     const pfpUrl = userData.users[0].pfp_url;
     const displayName = userData.users[0].display_name;
+    const userName = userData.users[0].user_name;
 
     const commentObject = {
       message: inputText,
@@ -112,6 +119,7 @@ app.frame("/:id", async (c) => {
       profile: {
         fid: frameData?.fid,
         displayName: displayName,
+        userName: userName,
         pfpUrl: pfpUrl,
       },
 
@@ -122,31 +130,46 @@ app.frame("/:id", async (c) => {
     await dbRef.update({ comment });
   }
 
-  console.log(buttonValue);
   if (buttonValue === "noComment") {
     comment = [];
   }
 
   return c.res({
     image: (
-      <Box grow alignHorizontal="center" backgroundColor="black" width="100%">
-        <Image src={image} objectFit="cover" height="100%" />
-
-        {comment.map((com: any, index: number) => (
-          <div
-            style={{
-              color: com.color || "white",
-              position: "absolute",
-              fontSize: com.size || textSizes,
-              top: com.top + "%",
-              left: com.left + "%",
-              whiteSpace: "nowrap",
-            }}
-            key={index}
-          >
-            {com.message}
-          </div>
-        ))}
+      <Box grow alignHorizontal="center">
+        <span
+          style={{
+            backgroundColor: "black",
+            backgroundSize: "100% 100%",
+            display: "flex",
+            alignContent: "center",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          <Image src={image} objectFit="cover" height="100%" />
+          {comment.map((com: any, index: number) => (
+            <div
+              style={{
+                color: "white",
+                position: "absolute",
+                fontSize: com.size || textSizes,
+                top: com.top + "%",
+                left: com.left + "%",
+                whiteSpace: "nowrap",
+                textShadow: `${textOutline1} ${
+                  com?.color || "black"
+                }, ${textOutline2} ${com?.color || "black"}, ${textOutline3} ${
+                  com?.color || "black"
+                }, ${textOutline4} ${com?.color || "black"}`,
+              }}
+              key={index}
+            >
+              {com.message}
+            </div>
+          ))}
+        </span>
       </Box>
     ),
     intents: [

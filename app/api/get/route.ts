@@ -5,7 +5,8 @@ import { createSystem } from "frog/ui";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const encodedKey = searchParams.get("key");
-
+  console.log("sdfjlasjflasdjflasdjfsjlf");
+  console.log(encodedKey);
   if (!encodedKey) {
     return NextResponse.json(
       { error: "Missing 'key' parameter" },
