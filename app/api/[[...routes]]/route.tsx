@@ -12,6 +12,7 @@ const options = {
   method: "GET",
   headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
 };
+const zoraBaseUrl = "https://zora.co/collect/";
 
 const { Box, Image, VStack, Heading, Text } = createSystem({
   colors: {
@@ -134,6 +135,7 @@ app.frame("/:id", async (c) => {
     comment = [];
   }
 
+  const zoraUrl = zoraBaseUrl + id.replace(/:(?=[^:]*$)/, "/");
   return c.res({
     image: (
       <Box grow alignHorizontal="center">
@@ -194,9 +196,12 @@ app.frame("/:id", async (c) => {
       <Button.Link key="regist" href={url.replace(/\/api\/.*/, "")}>
         Other
       </Button.Link>,
-      <Button key="noComment" value="noComment">
-        Original
-      </Button>,
+      <Button.Link key="regist" href={zoraUrl}>
+        Zora
+      </Button.Link>,
+      // <Button key="noComment" value="noComment">
+      //   Original
+      // </Button>,
     ],
   });
 });

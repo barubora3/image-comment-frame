@@ -27,7 +27,9 @@ export default function List() {
   return (
     <div className="">
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8 text-white">Registered NFTs</h1>
+        <h1 className="text-3xl font-bold mb-8 text-white text-center md:text-left">
+          Registered NFTs
+        </h1>
         {nftList.length === 0 ? (
           <p className="text-lg text-white">There are no registered NFTs.</p>
         ) : (

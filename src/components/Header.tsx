@@ -9,7 +9,7 @@ export const Header = () => {
         <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4">
           <div></div>
           <h1 className="text-4xl font-bold tracking-wider text-center md:text-center pt-4">
-            <img src="/logo_cliped.png" alt="logo" className="inline h-14" />
+            <img src="/DEGEN_COMMENT.gif" alt="logo" className="inline h-14" />
           </h1>
           <div className="justify-self-center md:justify-self-end">
             {/* <SignInButton /> */}

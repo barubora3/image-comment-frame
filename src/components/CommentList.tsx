@@ -13,8 +13,10 @@ const CommentList = ({ comments }: { comments: any[] }) => {
 
   return (
     <>
-      <h2 className="text-white text-lg font-bold pb-2">Comment</h2>
-      <Card className="w-96 h-full overflow-y-auto bg-gray-700 border-none">
+      <h2 className="text-white text-lg font-bold pb-2 text-center md:text-left">
+        Comment
+      </h2>
+      <Card className=" h-full overflow-y-auto bg-gray-700 border-none w-auto">
         <CardContent className="py-2 px-4">
           {comments.map((comment, index) => (
             <>

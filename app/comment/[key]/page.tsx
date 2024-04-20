@@ -55,6 +55,7 @@ export default function Home() {
   });
 
   const [comments, setComments] = useState<any>([]);
+  const [imageUrl, setImageUrl] = useState("");
 
   const setAuthState = useSetAtom(authAtom);
   const authState = useAtomValue(authAtom);
@@ -97,8 +98,11 @@ export default function Home() {
         credentials: "include" as RequestCredentials,
       };
       // const imageRes = await fetch(`/api/${key}/image`, requestOptions);
-      const imageRes = fetch(`/api/${key}/image`, requestOptions);
-      console.log(imageRes);
+      const imageRes = await fetch(`/api/${key}/image`, requestOptions);
+      const imageBlob = await imageRes.blob();
+      const imageUrl = URL.createObjectURL(imageBlob);
+      setImageUrl(imageUrl);
+
       setIsLoading(false);
     };
     fetchData();
@@ -285,7 +289,9 @@ export default function Home() {
               className="mx-auto max-w-2xl text-center relative"
               style={{ overflow: "hidden" }}
             >
-              <img src={`/api/${key}/image`} alt="Image" className="mx-auto" />
+              {/* <img src={`/api/${key}/image`} alt="Image" className="mx-auto" /> */}
+              <img src={imageUrl} alt="Image" className="mx-auto" />
+
               <div
                 style={{
                   // color: superComment.color || "white",
@@ -301,7 +307,11 @@ export default function Home() {
                 {superComment.text}
               </div>
             </div>
-            <div className="absolute top-0 right-0 -mt-8 mr-10 2xl:mr-40">
+            <div
+              className="md:absolute md:px-0 md:top-0 md:right-0 md:-mt-8 md:mr-10 md:pt-0 2xl:mr-40 2xl:min-w-96
+            px-4 pt-10 w-auto 
+            "
+            >
               <CommentList comments={comments || []} />
             </div>
           </div>
@@ -365,7 +375,11 @@ export default function Home() {
             )}
             {authState && (
               <div className="flex justify-center item-center">
-                <Accordion type="single" collapsible className="w-[800px]">
+                <Accordion
+                  type="single"
+                  collapsible
+                  className="w-full md:w-[800px]"
+                >
                   <AccordionItem value="item-1">
                     <AccordionTrigger>
                       <div className="text-xl font-bold text-white ">
