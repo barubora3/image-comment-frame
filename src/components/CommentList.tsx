@@ -7,7 +7,7 @@ import { comment } from "postcss";
 import { getDateTime } from "../../app/utils/getDateTime";
 const CommentList = ({ comments }: { comments: any[] }) => {
   if (!comments || comments.length === 0) {
-    return <div className="text-white">No comments yet.</div>;
+    return <div className="text-white"></div>;
   }
   console.log(comments);
 
