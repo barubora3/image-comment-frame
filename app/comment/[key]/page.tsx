@@ -27,7 +27,7 @@ import { SignInButton } from "@farcaster/auth-kit";
 import CommentList from "../../../src/components/CommentList";
 import { authAtom } from "../../atoms/authAtom";
 import { useSetAtom, useAtomValue } from "jotai";
-import { shareUrlBase, embedParam } from "../../utils/url";
+import { shareUrlBase, embedParam, shareText } from "../../utils/url";
 import { randomCommentList } from "../../utils/randomComments";
 
 // share url
@@ -356,7 +356,7 @@ export default function Home() {
               <Button
                 onClick={() => {
                   window.open(
-                    `${shareUrlBase}Degen Comment🚀${window.location.origin}/comment/${key}${embedParam}${window.location.origin}/api/${key}`,
+                    `${shareUrlBase}${shareText}${window.location.origin}/comment/${key}${embedParam}${window.location.origin}/api/${key}`,
                     "_blank"
                   );
                 }}

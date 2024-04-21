@@ -8,7 +8,7 @@ import { useProfile } from "@farcaster/auth-kit";
 import { ethers } from "ethers";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { shareUrlBase, embedParam } from "../utils/url";
+import { shareUrlBase, embedParam, shareText } from "../utils/url";
 
 export default function Home() {
   return (
@@ -340,7 +340,7 @@ function RegistForm() {
                 // navigator.clipboard.writeText(shareUrl);
                 // toast.success("Copied to clipboard !");
                 window.open(
-                  `${shareUrlBase}Degen Comment🚀${commentPageUrl}${embedParam}${shareUrl}`,
+                  `${shareUrlBase}${shareText}${commentPageUrl}${embedParam}${shareUrl}`,
                   "_blank"
                 );
               }}
