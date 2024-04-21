@@ -48,6 +48,7 @@ export async function POST(req: Request) {
       },
     }
   );
+  console.log("get profile completed");
 
   const userData = await userInfo.json();
   const pfpUrl = userData.users[0].pfp_url;
@@ -60,6 +61,8 @@ export async function POST(req: Request) {
     userName: userName,
     pfpUrl,
   };
+
+  console.log(profile);
 
   const dbRef = db.ref(key);
   const snapshot = await dbRef.get();
