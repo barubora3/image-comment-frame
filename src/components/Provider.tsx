@@ -8,7 +8,8 @@ import "@farcaster/auth-kit/styles.css";
 const config = {
   relay: "https://relay.farcaster.xyz",
   rpcUrl:
-    "https://opt-mainnet.g.alchemy.com/v2/cpuacOtw2fy6itWrjMMtoSxqwdAdI1v6",
+    "https://opt-mainnet.g.alchemy.com/v2/" +
+    process.env.NEXT_PUBLIC_ALCHEMY_KEY,
   domain: process.env.NEXT_PUBLIC_DOMAIN!,
   siweUri: process.env.NEXT_PUBLIC_SIWE_URI!,
 };
