@@ -304,11 +304,13 @@ export default function Home() {
           <CommentList comments={comments} /> */}
           <div className="w-[100vw]">
             <div
-              className="mx-auto max-w-2xl text-center relative"
+              className="mx-auto max-w-2xl text-center relative text-center"
               style={{ overflow: "hidden" }}
             >
-              {/* ogp画像の60%を指定 */}
-              <div className="h-[378px] w-[720px] flex items-center justify-center relative">
+              {/* ogp画像を調整 */}
+              {/* PCの場合は60% */}
+              {/* SPの場合は30% */}
+              <div className="h-[189px] w-[360px] lg:h-[378px] lg:w-[720px] flex items-center justify-center relative  mx-auto lg:mx-0">
                 {isImageLoading && (
                   <div className="text-center">
                     <img
@@ -327,7 +329,11 @@ export default function Home() {
                     color: superComment.color || "white",
                     // color: "white",
                     position: "absolute",
-                    fontSize: (superComment.size * 3) / 5,
+                    // PC, SPでのサイズ調整
+                    fontSize:
+                      window.innerWidth >= 768
+                        ? (superComment.size * 3) / 5
+                        : (superComment.size * 3) / 10,
                     top: superComment.top + "%",
                     left: superComment.left + "%",
                     whiteSpace: "nowrap",
