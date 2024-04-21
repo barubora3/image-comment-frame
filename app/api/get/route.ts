@@ -2,6 +2,8 @@ import { db } from "@/lib/firebase";
 import { NextResponse } from "next/server";
 import { createSystem } from "frog/ui";
 
+export const revalidate = 60;
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const encodedKey = searchParams.get("key");

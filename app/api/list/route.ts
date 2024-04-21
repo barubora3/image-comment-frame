@@ -1,6 +1,8 @@
 import { db } from "@/lib/firebase";
 import { NextResponse } from "next/server";
 
+export const revalidate = 60;
+
 export async function GET() {
   try {
     const dbRef = db.ref();
