@@ -10,9 +10,27 @@ const fontSans = FontSans({
   subsets: ["latin"],
   variable: "--font-sans",
 });
+
+const siteName = "Degen Comment";
+const description =
+  "The app will allow us to leave comments on the NFT. \nYou can superimpose text on the image and share your thoughts with artists and degens around the world.";
+const url = "https://degen-comment.vercel.app/";
 export const metadata: Metadata = {
-  title: "Degen Comment",
-  description: "Degen Comment",
+  title: siteName,
+  description: description,
+  openGraph: {
+    title: siteName,
+    description,
+    url,
+    siteName,
+    type: "website",
+    images: [
+      {
+        url: `${url}/DEGEN_COMMENT.gif`,
+        alt: siteName,
+      },
+    ],
+  },
 };
 
 export default function RootLayout({
