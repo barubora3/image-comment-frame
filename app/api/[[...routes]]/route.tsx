@@ -7,7 +7,12 @@ import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
 import { db } from "@/lib/firebase";
 import { createSystem } from "frog/ui";
-import { textColors, textSizes, textColorCodes } from "../../utils/text";
+import {
+  textColors,
+  textSizes,
+  textColorCodes,
+  textOutlineStyle,
+} from "../../utils/text";
 const options = {
   method: "GET",
   headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
@@ -25,13 +30,21 @@ const { Box, Image, VStack, Heading, Text } = createSystem({
     medium: 0.02,
     large: 0.03,
   },
+  fonts: {
+    default: [
+      {
+        name: "Open Sans",
+        source: "google",
+        weight: 400,
+      },
+      {
+        name: "Open Sans",
+        source: "google",
+        weight: 600,
+      },
+    ],
+  },
 });
-
-const textOutlineSize = "1px";
-const textOutline1 = `${textOutlineSize} ${textOutlineSize} 0`;
-const textOutline2 = `-${textOutlineSize} ${textOutlineSize} 0`;
-const textOutline3 = `-${textOutlineSize} -${textOutlineSize} 0`;
-const textOutline4 = `${textOutlineSize} -${textOutlineSize} 0`;
 
 const app = new Frog({
   assetsPath: "/",
@@ -174,13 +187,16 @@ app.frame("/:id", async (c) => {
               ? com.color
               : textColorCodes[com.color as keyof typeof textColorCodes] ||
                 "black";
-            const textShadow = `${textOutline1} ${color}, ${textOutline2} ${color}, ${textOutline3} ${color}, ${textOutline4} ${color}`;
+            // const textShadow = textOutlineStyle(color);
+            const textShadow = textOutlineStyle("#fff");
+
             const message = com.message || "";
 
             return (
               <div
                 style={{
-                  color: "white",
+                  // color: "white",
+                  color: color,
                   position: "absolute",
                   fontSize,
                   top,

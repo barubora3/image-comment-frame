@@ -26,7 +26,6 @@ export async function POST(req: Request) {
   }
   // トランザクションデータをデコードして引数を取得
   const decodedArgs = iface.decodeFunctionData("addComment", tx.data);
-  console.log(decodedArgs);
 
   const key = decodedArgs[0];
   const fid = Number(decodedArgs[1]);
@@ -35,6 +34,8 @@ export async function POST(req: Request) {
   const color = decodedArgs[4];
   const left = Number(decodedArgs[5]);
   const top = Number(decodedArgs[6]);
+
+  console.log(key, fid, message, size, color, left, top);
 
   // get profile
   const userInfo = await fetch(
@@ -47,8 +48,8 @@ export async function POST(req: Request) {
       },
     }
   );
+
   const userData = await userInfo.json();
-  console.log(userData);
   const pfpUrl = userData.users[0].pfp_url;
   const displayName = userData.users[0].display_name;
   const userName = userData.users[0].username;
@@ -80,7 +81,6 @@ export async function POST(req: Request) {
   };
 
   comment.push(commentObject);
-  console.log(comment);
   await dbRef.update({ comment });
 
   return NextResponse.json({ message: "Comment complete !" }, { status: 200 });

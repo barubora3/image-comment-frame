@@ -22,7 +22,7 @@ import {
   chainId,
 } from "../../utils/blockchain";
 import ABI from "../../utils/abi.json";
-import { textColors } from "../../utils/text";
+import { textColors, textOutlineStylePreview } from "../../utils/text";
 import { SignInButton } from "@farcaster/auth-kit";
 import CommentList from "../../../src/components/CommentList";
 import { authAtom } from "../../atoms/authAtom";
@@ -180,7 +180,6 @@ export default function Home() {
       const nft = await contract.nfts(key);
       const isRegisted = nft[1];
 
-      let tx;
       if (!isRegisted) {
         // 未登録ならば登録作業も行う
         const res = await fetch(`/api/registerNFT?key=${key}`);
@@ -193,7 +192,7 @@ export default function Home() {
       // 料金を取得
       const fee = await contract.commentFee();
 
-      tx = await contract.addComment(
+      const tx = await contract.addComment(
         key,
         authState?.fid || fid,
         superComment.text,
@@ -205,24 +204,32 @@ export default function Home() {
           value: fee,
         }
       );
-      const receipt = await tx.wait();
+      const receipt = await tx.wait(0);
+      // tx.waitが信用なら無いので0.5秒待つ
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
       if (receipt.status === 1) {
+        console.log(receipt);
         // dbに登録する関数を投げっぱなしにする
-        fetch(`/api/addSuperComment`, {
+        await fetch(`/api/addSuperComment`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            txHash: tx.hash,
+            txHash: receipt.hash,
           }),
         });
 
         toast.success("Super comment posted successfully !");
-        setIsLoading(true);
-
-        location.reload();
+        setSuperComment({
+          text: "",
+          color: "#000000",
+          size: 50,
+          left: 0,
+          top: 20,
+        });
+        fetchData();
       } else {
         toast.error("Failed to post the super comment.");
       }
@@ -300,7 +307,8 @@ export default function Home() {
               className="mx-auto max-w-2xl text-center relative"
               style={{ overflow: "hidden" }}
             >
-              <div className="h-[360px] flex items-center justify-center">
+              {/* ogp画像の60%を指定 */}
+              <div className="h-[378px] w-[720px] flex items-center justify-center relative">
                 {isImageLoading && (
                   <div className="text-center">
                     <img
@@ -312,20 +320,24 @@ export default function Home() {
                 {!isImageLoading && (
                   <img src={imageUrl} alt="Image" className="mx-auto" />
                 )}
-              </div>
-              <div
-                style={{
-                  // color: superComment.color || "white",
-                  color: "white",
-                  position: "absolute",
-                  fontSize: superComment.size + "px",
-                  top: superComment.top + "%",
-                  left: superComment.left + "%",
-                  whiteSpace: "nowrap",
-                  textShadow: `1px 1px 0 ${superComment.color}, -1px 1px 0 ${superComment.color}, 1px -1px 0 ${superComment.color}, -1px -1px 0 ${superComment.color}`,
-                }}
-              >
-                {superComment.text}
+
+                {/* テキストのプレビュー */}
+                <div
+                  style={{
+                    color: superComment.color || "white",
+                    // color: "white",
+                    position: "absolute",
+                    fontSize: (superComment.size * 3) / 5,
+                    top: superComment.top + "%",
+                    left: superComment.left + "%",
+                    whiteSpace: "nowrap",
+                    // textShadow: textOutlineStyle(superComment.color),
+                    textShadow: textOutlineStylePreview("#fff"),
+                    fontFamily: "open-sans",
+                  }}
+                >
+                  {superComment.text}
+                </div>
               </div>
             </div>
             <div

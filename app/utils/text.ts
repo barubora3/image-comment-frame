@@ -23,3 +23,53 @@ export const textColorCodes = {
 };
 
 export const textSizes = 50;
+
+export const textOutlineStylePreview = (color: string) => {
+  return (
+    "1px 1px 0 " +
+    color +
+    ", -1px 1px 0 " +
+    color +
+    ", 1px -1px 0 " +
+    color +
+    ", -1px -1px 0 " +
+    color +
+    ", 1.5px 1.5px 0 " +
+    color +
+    ", 1.5px -1.5px 0 " +
+    color +
+    ", -1.5px 1.5px 0 " +
+    color +
+    ", -1.5px -1.5px 0 " +
+    color
+  );
+};
+
+export const textOutlineStyle = (color: string) => {
+  return (
+    "1px 1px 0 " +
+    color +
+    ", -1px 1px 0 " +
+    color +
+    ", 1px -1px 0 " +
+    color +
+    ", -1px -1px 0 " +
+    color +
+    ", 2px 2px 0 " +
+    color +
+    ", 2px -2px 0 " +
+    color +
+    ", -2px 2px 0 " +
+    color +
+    ", -2px -2px 0 " +
+    color +
+    ", 3px 3px 0 " +
+    color +
+    ", 3px -3px 0 " +
+    color +
+    ", -3px 3px 0 " +
+    color +
+    ", -3px -3px 0 " +
+    color
+  );
+};
