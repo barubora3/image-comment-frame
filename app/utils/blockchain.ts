@@ -1,4 +1,4 @@
-export const contractAddress = "0xb79f4D5eA453433e1c47f37Cf23539a303f7D9d7";
+export const contractAddress = "0x4Fc32C170a80B3DD39C27b38f288c2Cd2eDd7E82";
 export const degenProvider = "https://rpc.degen.tips";
 export const chainId = "0x27bc86aa";
 export const chainIdNumber = 666666666;
