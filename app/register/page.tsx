@@ -68,24 +68,36 @@ function RegistForm() {
 
   const networks = {
     zora: {
-      network: ZDKNetwork.Zora,
-      chain: ZDKChain.ZoraMainnet,
+      // network: ZDKNetwork.Zora,
+      // chain: ZDKChain.ZoraMainnet,
+      network: "zora",
       rpc: "https://rpc.zora.energy",
     },
     base: {
-      network: ZDKNetwork.Base,
-      chain: ZDKChain.BaseMainnet,
+      // network: ZDKNetwork.Base,
+      // chain: ZDKChain.BaseMainnet,
+      network: "base",
       rpc: "https://base-mainnet.public.blastapi.io	",
     },
     eth: {
-      network: ZDKNetwork.Ethereum,
-      chain: ZDKChain.Mainnet,
+      // network: ZDKNetwork.Ethereum,
+      // chain: ZDKChain.Mainnet,
+      network: "ethereum",
       rpc: "https://cloudflare-eth.com",
     },
     oeth: {
-      network: ZDKNetwork.Optimism,
-      chain: ZDKChain.OptimismMainnet,
+      // network: ZDKNetwork.Optimism,
+      // chain: ZDKChain.OptimismMainnet,
+      network: "optimism",
       rpc: "https://mainnet.optimism.io",
+    },
+    arb: {
+      network: "arbitrum",
+      rpc: "https://arb1.arbitrum.io/rpc",
+    },
+    degen: {
+      network: "degen",
+      rpc: "https://rpc.degen.tips",
     },
   };
   const networkList = Object.keys(networks);
@@ -119,6 +131,109 @@ function RegistForm() {
     // tokenIdがnumber型であることを確認
     return typeof tokenId === "number" && !isNaN(tokenId);
   }
+
+  // Zora SDKを使った処理はコメントアウト
+  // const step1 = async () => {
+  //   if (zoraUrl === "") {
+  //     alert("Please input Zora URL");
+  //   }
+  //   // バリデーションチェック
+  //   let parts;
+  //   let network;
+  //   let contractAddress;
+  //   let tokenId;
+  //   try {
+  //     parts = zoraUrl.split("/");
+  //     network = parts[4].split(":")[0];
+  //     contractAddress = parts[4].split(":")[1];
+  //     tokenId = parts[5];
+  //     if (
+  //       !networkList.includes(network) ||
+  //       !isValidEVMAddress(contractAddress) ||
+  //       !isValidTokenId(tokenId)
+  //     ) {
+  //       alert(
+  //         "Invalid Zora URL\nnetwork: " +
+  //           network +
+  //           "\ncontractAddress: " +
+  //           contractAddress +
+  //           "\ntokenId: " +
+  //           tokenId
+  //       );
+  //       return;
+  //     }
+  //   } catch (e) {
+  //     alert("Invalid Zora URL");
+  //     return;
+  //   }
+
+  //   // チェックがOKならばNFT情報を取得
+  //   const networkName = networks[network as keyof typeof networks]["network"];
+  //   const chain = networks[network as keyof typeof networks]["chain"];
+  //   const networkInfo = {
+  //     network: networkName,
+  //     chain: chain,
+  //   };
+
+  //   const API_ENDPOINT = "https://api.zora.co/graphql";
+  //   const args = {
+  //     endPoint: API_ENDPOINT,
+  //     networks: [networkInfo],
+  //     // apiKey: process.env.API_KEY,
+  //   };
+
+  //   const zdk = new ZDK(args); // All arguments
+  //   const res: any = await zdk.token({
+  //     token: {
+  //       address: contractAddress,
+  //       tokenId: tokenId,
+  //     },
+  //   });
+  //   console.log(res);
+  //   // const collection = await zdk.collection({ address: contractAddress });
+  //   // console.log(collection);
+
+  //   // コントラクトのクリエイターを取得
+  //   const provider = new ethers.JsonRpcProvider(
+  //     networks[network as keyof typeof networks]["rpc"]
+  //   );
+  //   // Zoraで発行されたNFTの場合はowner関数で取れるっぽい
+  //   const contract = new ethers.Contract(contractAddress, ZoraNFTABI, provider);
+  //   let ownerAddress;
+  //   try {
+  //     ownerAddress = await contract.owner();
+  //   } catch (e) {
+  //     console.log(e);
+  //     // ownerが取れなかったらコントラクトデプロイヤーを取得
+  //     const deployTransaction = await provider.getTransaction(contractAddress);
+  //     ownerAddress = deployTransaction?.from;
+
+  //     if (!ownerAddress) {
+  //       alert("Can't get owner address");
+  //       return;
+  //     }
+  //   }
+
+  //   setContractAddress(contractAddress);
+  //   setTokenId(tokenId);
+  //   setNetworkName(network);
+  //   setName(res?.token?.token?.name);
+  //   setCreator(ownerAddress);
+
+  //   const fetchAgent = new MediaFetchAgent(Networks.MAINNET);
+  //   const ipfsHash = res.token?.token?.image?.url?.replace("ipfs://", "");
+  //   const imageResult: any = await fetchAgent.fetchContent(
+  //     // "https://ipfs.io/ipfs/" + ipfsHash,
+  //     "https://ipfs.decentralized-content.com/ipfs/" + ipfsHash,
+  //     "application/json"
+  //   );
+  //   console.log(imageResult);
+  //   console.log(imageResult.uri);
+  //   setImage(imageResult?.uri);
+
+  //   // 次のステップへ
+  //   setCurrentStep(1);
+  // };
 
   const step1 = async () => {
     if (zoraUrl === "") {
@@ -156,29 +271,15 @@ function RegistForm() {
 
     // チェックがOKならばNFT情報を取得
     const networkName = networks[network as keyof typeof networks]["network"];
-    const chain = networks[network as keyof typeof networks]["chain"];
-    const networkInfo = {
-      network: networkName,
-      chain: chain,
-    };
-
-    const API_ENDPOINT = "https://api.zora.co/graphql";
-    const args = {
-      endPoint: API_ENDPOINT,
-      networks: [networkInfo],
-      // apiKey: process.env.API_KEY,
-    };
-
-    const zdk = new ZDK(args); // All arguments
-    const res: any = await zdk.token({
-      token: {
-        address: contractAddress,
-        tokenId: tokenId,
+    const response = await fetch("/api/nftInfo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({ networkName, contractAddress, tokenId }),
     });
-    console.log(res);
-    // const collection = await zdk.collection({ address: contractAddress });
-    // console.log(collection);
+
+    const data = await response.json();
 
     // コントラクトのクリエイターを取得
     const provider = new ethers.JsonRpcProvider(
@@ -204,19 +305,12 @@ function RegistForm() {
     setContractAddress(contractAddress);
     setTokenId(tokenId);
     setNetworkName(network);
-    setName(res?.token?.token?.name);
+    setName(data.name);
     setCreator(ownerAddress);
 
-    const fetchAgent = new MediaFetchAgent(Networks.MAINNET);
-    const ipfsHash = res.token?.token?.image?.url?.replace("ipfs://", "");
-    const imageResult: any = await fetchAgent.fetchContent(
-      // "https://ipfs.io/ipfs/" + ipfsHash,
-      "https://ipfs.decentralized-content.com/ipfs/" + ipfsHash,
-      "application/json"
-    );
-    console.log(imageResult);
-    console.log(imageResult.uri);
-    setImage(imageResult?.uri);
+    console.log(data);
+
+    setImage(data.image_url);
 
     // 次のステップへ
     setCurrentStep(1);

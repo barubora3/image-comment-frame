@@ -437,7 +437,7 @@ export default function Home() {
                             placeholder="Enter a comment)"
                             value={freeComment}
                             onChange={(e) => setFreeComment(e.target.value)}
-                            maxLength={10}
+                            maxLength={20}
                           />
                         </div>
 
