@@ -9,7 +9,7 @@ import { ethers } from "ethers";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { shareUrlBase, embedParam, shareText } from "../utils/url";
-
+import ProgressCircle from "@/components/ProgressCircle";
 export default function Home() {
   return (
     <>
@@ -21,7 +21,8 @@ export default function Home() {
 }
 
 import { ZDK, ZDKNetwork, ZDKChain } from "@zoralabs/zdk";
-import { MediaFetchAgent, Networks } from "@zoralabs/nft-hooks";
+import useWindowSize from "react-use/lib/useWindowSize";
+import Confetti from "react-confetti";
 
 const API_ENDPOINT = "https://api.zora.co/graphql";
 const zdk = new ZDK({ endpoint: API_ENDPOINT }); // Defaults to Ethereum Mainnet
@@ -29,12 +30,14 @@ const zdk = new ZDK({ endpoint: API_ENDPOINT }); // Defaults to Ethereum Mainnet
 const ZoraNFTABI = ["function owner() view returns (address)"];
 
 function RegistForm() {
-  // const profile = useProfile();
+  const { width, height } = useWindowSize();
 
   // const {
   //   isAuthenticated,
   //   profile: { fid, displayName, custody, pfpUrl },
   // } = profile;
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // step1
   const [currentStep, setCurrentStep] = useState(0);
@@ -53,6 +56,7 @@ function RegistForm() {
   // step3
   const [shareUrl, setShareUrl] = useState("");
   const [commentPageUrl, setCommentPageUrl] = useState("");
+  const [recycle, setRecycle] = useState(false);
 
   // if (!isAuthenticated) {
   //   return (
@@ -269,6 +273,8 @@ function RegistForm() {
       return;
     }
 
+    setIsLoading(true);
+
     // チェックがOKならばNFT情報を取得
     const networkName = networks[network as keyof typeof networks]["network"];
     const response = await fetch("/api/nftInfo", {
@@ -312,11 +318,13 @@ function RegistForm() {
 
     setImage(data.image_url);
 
+    setIsLoading(false);
     // 次のステップへ
     setCurrentStep(1);
   };
 
   const step2 = async () => {
+    setIsLoading(true);
     const key = networkName + ":" + contractAddress + ":" + tokenId;
     const value = {
       contractAddress,
@@ -350,13 +358,22 @@ function RegistForm() {
       const res = await response.json();
       setShareUrl(window.location.origin + "/api/" + key);
       setCommentPageUrl(window.location.origin + "/comment/" + key);
-      alert(res.message);
 
       setCurrentStep(2);
+
+      setRecycle(true);
+      setTimeout(() => {
+        setRecycle(false);
+      }, 3000);
     } else {
       alert("something wrong!");
     }
+    setIsLoading(false);
   };
+
+  if (isLoading) {
+    return <ProgressCircle />;
+  }
 
   return (
     <div className="flex justify-center items-center px-4 md:px-0 ">
@@ -421,6 +438,7 @@ function RegistForm() {
 
       {currentStep === 2 && (
         <div className="bg-white p-8 rounded-lg shadow-xl  w-full max-w-2xl">
+          <Confetti width={width} height={height} recycle={recycle} />
           <Label className="block mb-6 text-xl font-bold text-gray-700">
             Step 3: Registration Complete 🎉
           </Label>
