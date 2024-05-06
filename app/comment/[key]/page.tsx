@@ -29,7 +29,7 @@ import { authAtom } from "../../atoms/authAtom";
 import { useSetAtom, useAtomValue } from "jotai";
 import { shareUrlBase, embedParam, shareText } from "../../utils/url";
 import { randomCommentList } from "../../utils/randomComments";
-import { getImageUrl } from "../../utils/url";
+import { getImageUrl, getZoraUrl } from "../../utils/url";
 // share url
 // https://warpcast.com/~/compose?text=Mint%20Untitiled%20for%20free%20%E2%9C%A8%0A%0Ahttps%3A%2F%2Ffar.quest%2Fcontracts%2Fdegen%2Funtitiled-79&embeds[]=https://far.quest/contracts/degen/untitiled-79&rand=0.92291
 
@@ -380,13 +380,7 @@ export default function Home() {
 
               <Button
                 onClick={() => {
-                  window.open(
-                    `https://zora.co/collect/${key.replace(
-                      /:(?=[^:]*$)/,
-                      "/"
-                    )}`,
-                    "_blank"
-                  );
+                  window.open(getZoraUrl(key), "_blank");
                 }}
               >
                 View on Zora

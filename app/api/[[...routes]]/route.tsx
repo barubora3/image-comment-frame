@@ -14,13 +14,12 @@ import {
   textColorCodes,
   textOutlineStyle,
 } from "../../utils/text";
-import { getImageUrl } from "../../utils/url";
+import { getImageUrl, getZoraUrl } from "../../utils/url";
 import { createImage } from "../../utils/createImage";
 const options = {
   method: "GET",
   headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
 };
-const zoraBaseUrl = "https://zora.co/collect/";
 
 const { Box, Image, VStack, Heading, Text } = createSystem({
   colors: {
@@ -155,7 +154,7 @@ app.frame("/:id", async (c) => {
     comment = [];
   }
 
-  const zoraUrl = zoraBaseUrl + id.replace(/:(?=[^:]*$)/, "/");
+  const zoraUrl = getZoraUrl(id);
 
   const imageUrl = getImageUrl(id);
   return c.res({
