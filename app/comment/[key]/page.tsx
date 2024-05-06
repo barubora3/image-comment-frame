@@ -88,29 +88,18 @@ export default function Home() {
     const data = await response.json();
     setComments(data.data.comment || []);
 
-    setIsLoading(false);
-
-    // const imageRes = await fetch(`/api/${key}/image`, requestOptions);
-    imageLoad();
-  };
-
-  const imageLoad = async () => {
-    // 画像を取得
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "User-Agent": navigator.userAgent,
-        Referer: document.location.href,
-      },
-      credentials: "include" as RequestCredentials,
-    };
-    setIsImageLoading(true);
-    // const imageRes = await fetch(`/api/${key}/image`, requestOptions);
-    // const imageBlob = await imageRes.blob();
-    // const imageUrl = URL.createObjectURL(imageBlob);
     const imageUrl = getImageUrl(key);
-    setImageUrl(imageUrl);
-    setIsImageLoading(false);
+    const img = new Image();
+    img.onload = () => {
+      setImageUrl(imageUrl);
+      setIsImageLoading(false);
+      setIsLoading(false);
+    };
+    img.onerror = () => {
+      setIsImageLoading(false);
+      setIsLoading(false);
+    };
+    img.src = imageUrl;
   };
 
   const handleFreeCommentSubmit = async () => {

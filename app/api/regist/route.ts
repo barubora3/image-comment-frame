@@ -1,5 +1,6 @@
 import { db } from "../../../src/lib/firebase";
 import { NextRequest, NextResponse } from "next/server";
+import { createImage } from "../../utils/createImage";
 
 interface StoreDataRequest {
   key: string;
@@ -43,9 +44,9 @@ export async function POST(req: NextRequest) {
       creator: value.creator,
     };
 
-    console.log(data);
-
     await dbRef.set(data);
+
+    createImage(key);
     return NextResponse.json({ message: "Regist complete !" }, { status: 200 });
   } catch (error) {
     console.error("Error storing data:", error);
