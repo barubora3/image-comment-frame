@@ -1,6 +1,7 @@
 import { db } from "@/lib/firebase";
 import { NextResponse } from "next/server";
 import { textColors, textSizes } from "../../utils/text";
+import { createImage } from "../../utils/createImage";
 
 export async function POST(req: Request) {
   const {
@@ -36,10 +37,14 @@ export async function POST(req: Request) {
     profile: profile,
     createAt: unixTimeMs,
   };
-
   comment.push(commentObject);
-  console.log(comment);
+
   await dbRef.update({ comment });
+
+  // 画像生成して完了するまで待機
+  // ただしコメント数が多くなるとタイムアウトが発生する可能性があるため、固定時間待機する
+  await createImage(key);
+  // await new Promise((resolve) => setTimeout(resolve, 3000));
 
   return NextResponse.json({ message: "Comment complete !" }, { status: 200 });
 }

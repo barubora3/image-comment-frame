@@ -29,7 +29,7 @@ import { authAtom } from "../../atoms/authAtom";
 import { useSetAtom, useAtomValue } from "jotai";
 import { shareUrlBase, embedParam, shareText } from "../../utils/url";
 import { randomCommentList } from "../../utils/randomComments";
-
+import { getImageUrl } from "../../utils/url";
 // share url
 // https://warpcast.com/~/compose?text=Mint%20Untitiled%20for%20free%20%E2%9C%A8%0A%0Ahttps%3A%2F%2Ffar.quest%2Fcontracts%2Fdegen%2Funtitiled-79&embeds[]=https://far.quest/contracts/degen/untitiled-79&rand=0.92291
 
@@ -105,14 +105,16 @@ export default function Home() {
       credentials: "include" as RequestCredentials,
     };
     setIsImageLoading(true);
-    const imageRes = await fetch(`/api/${key}/image`, requestOptions);
-    const imageBlob = await imageRes.blob();
-    const imageUrl = URL.createObjectURL(imageBlob);
+    // const imageRes = await fetch(`/api/${key}/image`, requestOptions);
+    // const imageBlob = await imageRes.blob();
+    // const imageUrl = URL.createObjectURL(imageBlob);
+    const imageUrl = getImageUrl(key);
     setImageUrl(imageUrl);
     setIsImageLoading(false);
   };
 
   const handleFreeCommentSubmit = async () => {
+    setIsImageLoading(true);
     const textLimit = 20;
     if (freeComment.length > textLimit) {
       toast.error(`Comments are limited to ${textLimit} characters.`);
@@ -158,6 +160,7 @@ export default function Home() {
       toast.error("window.ethreum not found");
       return;
     }
+
     try {
       await ethereum.request({ method: "eth_requestAccounts" });
 
@@ -204,6 +207,8 @@ export default function Home() {
           value: fee,
         }
       );
+      setIsImageLoading(true);
+
       const receipt = await tx.wait(0);
       // tx.waitが信用なら無いので0.5秒待つ
       await new Promise((resolve) => setTimeout(resolve, 500));
@@ -235,6 +240,8 @@ export default function Home() {
       }
     } catch (error) {
       toast.error("An error occurred");
+      setIsImageLoading(false);
+
       console.log(error);
     }
   };
@@ -342,7 +349,7 @@ export default function Home() {
                     fontFamily: "open-sans",
                   }}
                 >
-                  {superComment.text}
+                  {isImageLoading ? "" : superComment.text}
                 </div>
               </div>
             </div>

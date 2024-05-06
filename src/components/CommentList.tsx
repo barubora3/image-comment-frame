@@ -16,12 +16,15 @@ const CommentList = ({ comments }: { comments: any[] }) => {
       <h2 className="text-white text-lg font-bold pb-2 text-center md:text-left">
         Comment
       </h2>
-      <Card className="h-96 lg:h-auto lg:max-h-[calc(100vh-200px)]  overflow-y-auto bg-gray-700 border-none w-auto">
+      <Card className="h-96 lg:h-auto lg:max-h-[calc(100vh-200px)]  overflow-y-auto bg-gray-700 border-none w-auto ">
         <CardContent className="py-2 px-4">
           {comments.map((comment, index) => (
             <>
               {comment && (
-                <div key={index} className="flex items-center py-2">
+                <div
+                  key={index}
+                  className="flex items-center py-2 max-w-[335px]"
+                >
                   <Link
                     href={`https://warpcast.com/${comment?.profile?.userName}`}
                     target="_blank"

@@ -10,8 +10,12 @@ if (admin.apps.length === 0) {
       clientEmail: process.env.FSA_CLIENT_EMAIL,
     }),
     databaseURL: "https://image-comment-frame-default-rtdb.firebaseio.com",
+    storageBucket: "image-comment-frame.appspot.com",
   });
 }
 
+const { getStorage } = require("firebase-admin/storage");
 const { getDatabase } = require("firebase-admin/database");
+
 export const db = getDatabase();
+export const storage = getStorage().bucket();

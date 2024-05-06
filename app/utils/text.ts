@@ -47,29 +47,45 @@ export const textOutlineStylePreview = (color: string) => {
 
 export const textOutlineStyle = (color: string) => {
   return (
-    "1px 1px 0 " +
-    color +
-    ", -1px 1px 0 " +
-    color +
-    ", 1px -1px 0 " +
-    color +
-    ", -1px -1px 0 " +
-    color +
-    ", 2px 2px 0 " +
-    color +
-    ", 2px -2px 0 " +
-    color +
-    ", -2px 2px 0 " +
-    color +
-    ", -2px -2px 0 " +
-    color +
-    ", 3px 3px 0 " +
-    color +
-    ", 3px -3px 0 " +
+    // "1px 1px 0 " +
+    // color +
+    // ", -1px 1px 0 " +
+    // color +
+    // ", 1px -1px 0 " +
+    // color +
+    // ", -1px -1px 0 " +
+    // color +
+    // ", 2px 2px 0 " +
+    // color +
+    // ", 2px -2px 0 " +
+    // color +
+    // ", -2px 2px 0 " +
+    // color +
+    // ", -2px -2px 0 " +
+    // color +
+    // ", 3px 3px 0 " +
+    // color +
+    // ", 3px -3px 0 " +
+    // color +
+    // ", -3px 3px 0 " +
+    // color +
+    // ", -3px -3px 0 " +
+    // color
+    "3px 3px 0 " +
     color +
     ", -3px 3px 0 " +
     color +
+    ", 3px -3px 0 " +
+    color +
     ", -3px -3px 0 " +
+    color +
+    ", 3px 0px 0 " +
+    color +
+    ", -3px 0px 0 " +
+    color +
+    ", 0px 3px 0 " +
+    color +
+    ", 0px -3px 0 " +
     color
   );
 };

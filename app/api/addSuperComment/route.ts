@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { ethers } from "ethers";
 
 import { degenProvider, contractAddress } from "../../utils/blockchain";
+import { createImage } from "../../utils/createImage";
 import ABI from "../../utils/abi.json";
 
 interface AddFreeCommentRequest {
@@ -85,6 +86,9 @@ export async function POST(req: Request) {
 
   comment.push(commentObject);
   await dbRef.update({ comment });
+
+  // 画像生成して完了するまで待機
+  await createImage(key);
 
   return NextResponse.json({ message: "Comment complete !" }, { status: 200 });
 }

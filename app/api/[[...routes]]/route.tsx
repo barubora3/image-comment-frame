@@ -5,14 +5,17 @@ import { devtools } from "frog/dev";
 // import { neynar } from 'frog/hubs'
 import { handle } from "frog/next";
 import { serveStatic } from "frog/serve-static";
-import { db } from "@/lib/firebase";
+import { db, storage } from "@/lib/firebase";
 import { createSystem } from "frog/ui";
+
 import {
   textColors,
   textSizes,
   textColorCodes,
   textOutlineStyle,
 } from "../../utils/text";
+import { getImageUrl } from "../../utils/url";
+import { createImage } from "../../utils/createImage";
 const options = {
   method: "GET",
   headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
@@ -123,7 +126,7 @@ app.frame("/:id", async (c) => {
     const userData = await userInfo.json();
     const pfpUrl = userData.users[0].pfp_url;
     const displayName = userData.users[0].display_name;
-    const userName = userData.users[0].user_name;
+    const userName = userData.users[0].username;
 
     const commentObject = {
       message: inputText,
@@ -143,6 +146,9 @@ app.frame("/:id", async (c) => {
 
     comment.push(commentObject);
     await dbRef.update({ comment });
+
+    // image upload
+    createImage(id);
   }
 
   if (buttonValue === "noComment") {
@@ -150,83 +156,90 @@ app.frame("/:id", async (c) => {
   }
 
   const zoraUrl = zoraBaseUrl + id.replace(/:(?=[^:]*$)/, "/");
+
+  const imageUrl = getImageUrl(id);
   return c.res({
-    image: (
-      <Box grow alignHorizontal="center">
-        <span
-          style={{
-            backgroundColor: "black",
-            backgroundSize: "100% 100%",
-            display: "flex",
-            alignContent: "center",
-            alignItems: "center",
-            justifyContent: "center",
-            width: "100%",
-          }}
-        >
-          <Image src={image} objectFit="cover" height="100%" />
-          {/* NFT名 */}
-          <div
-            style={{
-              color: "white",
-              fontSize: 60,
-              position: "absolute",
-              top: 0,
-              left: 0,
-              background: "rgba(255, 255, 255, 0.4)",
-              padding: "4px 8px",
-            }}
-          >
-            {name}
-          </div>
-          {comment.map((com: any, index: number) => {
-            const fontSize = com.size || textSizes;
-            const top = com.top + "%";
-            const left = com.left + "%";
-            const color = com?.color?.startsWith("#")
-              ? com.color
-              : textColorCodes[com.color as keyof typeof textColorCodes] ||
-                "black";
-            // const textShadow = textOutlineStyle(color);
-            const textShadow = textOutlineStyle("#fff");
+    image: imageUrl,
+    // (
+    // <Box grow alignHorizontal="center">
+    //   <span
+    //     style={{
+    //       backgroundColor: "black",
+    //       backgroundSize: "100% 100%",
+    //       display: "flex",
+    //       alignContent: "center",
+    //       alignItems: "center",
+    //       justifyContent: "center",
+    //       width: "100%",
+    //     }}
+    //   >
+    //     <Image src={image} objectFit="cover" height="100%" />
+    //     {/* NFT名 */}
+    //     <div
+    //       style={{
+    //         color: "white",
+    //         fontSize: 60,
+    //         position: "absolute",
+    //         top: 0,
+    //         left: 0,
+    //         background: "rgba(255, 255, 255, 0.4)",
+    //         padding: "4px 8px",
+    //       }}
+    //     >
+    //       {name}
+    //     </div>
+    //     {comment.map((com: any, index: number) => {
+    //       const fontSize = com.size || textSizes;
+    //       const top = com.top + "%";
+    //       const left = com.left + "%";
+    //       const color = com?.color?.startsWith("#")
+    //         ? com.color
+    //         : textColorCodes[com.color as keyof typeof textColorCodes] ||
+    //           "black";
+    //       // const textShadow = textOutlineStyle(color);
+    //       const textShadow = textOutlineStyle("#fff");
 
-            const message = com.message || "";
+    //       const message = com.message || "";
 
-            return (
-              <div
-                style={{
-                  // color: "white",
-                  color: color,
-                  position: "absolute",
-                  fontSize,
-                  top,
-                  left,
-                  whiteSpace: "nowrap",
-                  textShadow,
-                }}
-                key={index}
-              >
-                {message}
-              </div>
-            );
-          })}
-        </span>
-      </Box>
-    ),
+    //       return (
+    //         <div
+    //           style={{
+    //             // color: "white",
+    //             color: color,
+    //             position: "absolute",
+    //             fontSize,
+    //             top,
+    //             left,
+    //             whiteSpace: "nowrap",
+    //             textShadow,
+    //           }}
+    //           key={index}
+    //         >
+    //           {message}
+    //         </div>
+    //       );
+    //     })}
+    //   </span>
+    // </Box>
+    // ),
     intents: [
       <TextInput key="commentText" placeholder="Enter your comment..." />,
       <Button key="commentButton" value="doComment">
         Comment
       </Button>,
+      <Button key="refresh" value="refresh">
+        Refresh
+      </Button>,
+
       <Button.Link
         key="superComment"
         href={url.replace(/\/api\/.*/, "/comment/" + id)}
       >
         Super Comment
       </Button.Link>,
-      <Button.Link key="regist" href={url.replace(/\/api\/.*/, "")}>
-        Other
-      </Button.Link>,
+      // <Button.Link key="regist" href={url.replace(/\/api\/.*/, "")}>
+      //   Other
+      // </Button.Link>,
       <Button.Link key="regist" href={zoraUrl}>
         Zora
       </Button.Link>,
