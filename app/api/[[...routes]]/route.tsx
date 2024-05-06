@@ -51,10 +51,16 @@ const { Box, Image, VStack, Heading, Text } = createSystem({
 const app = new Frog({
   assetsPath: "/",
   basePath: "/api",
-  // Supply a Hub to enable frame verification.
-  // hub: neynar({ apiKey: process.env.NEYNAR_API_KEY! }),
   headers: {
     "cache-control": "max-age=0",
+  },
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": process.env.AIRSTACK_API_KEY!,
+      },
+    },
   },
 });
 
@@ -123,7 +129,7 @@ app.frame("/:id", async (c) => {
       options
     );
     const userData = await userInfo.json();
-console.log(userData);
+    console.log(userData);
     const pfpUrl = userData.users[0].pfp_url;
     const displayName = userData.users[0].display_name;
     const userName = userData.users[0].username;
