@@ -123,6 +123,7 @@ app.frame("/:id", async (c) => {
       options
     );
     const userData = await userInfo.json();
+console.log(userData);
     const pfpUrl = userData.users[0].pfp_url;
     const displayName = userData.users[0].display_name;
     const userName = userData.users[0].username;

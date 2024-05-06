@@ -253,6 +253,8 @@ function RegistForm() {
       network = parts[4].split(":")[0];
       contractAddress = parts[4].split(":")[1];
       tokenId = parts[5];
+if(!tokenId)
+{tokenId="1"}
       if (
         !networkList.includes(network) ||
         !isValidEVMAddress(contractAddress) ||
