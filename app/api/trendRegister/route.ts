@@ -132,7 +132,10 @@ export async function GET() {
       fetch(url, options);
 
       // 1件登録したら終了
-      return;
+      return NextResponse.json(
+        { message: "register trend nft finished" },
+        { status: 200 }
+      );
     }
   }
 
