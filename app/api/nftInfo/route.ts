@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const { networkName, contractAddress, tokenId } = await request.json();
 
+  console.log(
+    `https://api.simplehash.com/api/v0/nfts/${networkName}/${contractAddress}/${tokenId}`
+  );
+  console.log(process.env.SIMPLE_HASH_API_KEY);
+
   const response = await fetch(
     `https://api.simplehash.com/api/v0/nfts/${networkName}/${contractAddress}/${tokenId}`,
     {

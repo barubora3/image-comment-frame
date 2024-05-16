@@ -56,6 +56,15 @@ export async function GET() {
         continue;
       }
 
+      console.log(process.env.NEXT_PUBLIC_SIWE_URI! + "/api/nftInfo");
+      console.log(
+        JSON.stringify({
+          networkName: chain,
+          contractAddress,
+          tokenId,
+        })
+      );
+
       const response = await fetch(
         process.env.NEXT_PUBLIC_SIWE_URI! + "/api/nftInfo",
         {
