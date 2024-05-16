@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
+export const revalidate = 0;
 
 export async function POST(request: Request) {
   console.log("BBBBBB");
-  console.log(request.body);
   let body: any;
   try {
     body = await request.json();
@@ -10,6 +10,8 @@ export async function POST(request: Request) {
     console.error("Failed to parse request body:", error);
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
   }
+
+  console.log(body);
 
   const { networkName, contractAddress, tokenId } = body;
 
