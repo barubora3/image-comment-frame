@@ -233,21 +233,25 @@ app.frame("/:id", async (c) => {
       <Button key="commentButton" value="doComment">
         Comment
       </Button>,
-      <Button key="refresh" value="refresh">
-        Refresh
-      </Button>,
+      // <Button key="refresh" value="refresh">
+      //   Refresh
+      // </Button>,
 
       <Button.Link
         key="superComment"
         href={url.replace(/\/api\/.*/, "/comment/" + id)}
       >
-        Super Comment
+        View
+      </Button.Link>,
+
+      <Button.Link key="addNFT" href={url.replace(/\/api\/.*/, "/register/")}>
+        Add NFT
       </Button.Link>,
       // <Button.Link key="regist" href={url.replace(/\/api\/.*/, "")}>
       //   Other
       // </Button.Link>,
       <Button.Link key="regist" href={zoraUrl}>
-        Zora
+        Mint
       </Button.Link>,
       // <Button key="noComment" value="noComment">
       //   Original
