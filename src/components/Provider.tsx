@@ -5,6 +5,11 @@ import { ReactNode } from "react";
 import { Toaster } from "react-hot-toast";
 import "@farcaster/auth-kit/styles.css";
 
+import "@rainbow-me/rainbowkit/styles.css";
+import { getDefaultConfig, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { WagmiProvider } from "wagmi";
+import { mainnet, polygon, optimism, arbitrum, base, zora } from "wagmi/chains";
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 const config = {
   relay: "https://relay.farcaster.xyz",
   rpcUrl:
@@ -13,6 +18,13 @@ const config = {
   domain: process.env.NEXT_PUBLIC_DOMAIN!,
   siweUri: process.env.NEXT_PUBLIC_SIWE_URI!,
 };
+
+// const rainbowConfig = getDefaultConfig({
+//   appName: "Degen Comment",
+//   projectId: process.env.,
+//   chains: [mainnet, polygon, optimism, arbitrum, base, zora],
+//   ssr: true, // If your dApp uses server side rendering (SSR)
+// });
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <html>
