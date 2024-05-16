@@ -23,11 +23,11 @@ export default function Home() {
 import { ZDK, ZDKNetwork, ZDKChain } from "@zoralabs/zdk";
 import useWindowSize from "react-use/lib/useWindowSize";
 import Confetti from "react-confetti";
+import { networks } from "../utils/networks";
+import { ZoraNFTABI, ZoraCommentABI } from "../utils/abi";
 
 const API_ENDPOINT = "https://api.zora.co/graphql";
 const zdk = new ZDK({ endpoint: API_ENDPOINT }); // Defaults to Ethereum Mainnet
-
-const ZoraNFTABI = ["function owner() view returns (address)"];
 
 function RegistForm() {
   const { width, height } = useWindowSize();
@@ -70,40 +70,6 @@ function RegistForm() {
   // step2 登録情報の確認
   // step3 登録完了
 
-  const networks = {
-    zora: {
-      // network: ZDKNetwork.Zora,
-      // chain: ZDKChain.ZoraMainnet,
-      network: "zora",
-      rpc: "https://rpc.zora.energy",
-    },
-    base: {
-      // network: ZDKNetwork.Base,
-      // chain: ZDKChain.BaseMainnet,
-      network: "base",
-      rpc: "https://base-mainnet.public.blastapi.io	",
-    },
-    eth: {
-      // network: ZDKNetwork.Ethereum,
-      // chain: ZDKChain.Mainnet,
-      network: "ethereum",
-      rpc: "https://cloudflare-eth.com",
-    },
-    oeth: {
-      // network: ZDKNetwork.Optimism,
-      // chain: ZDKChain.OptimismMainnet,
-      network: "optimism",
-      rpc: "https://mainnet.optimism.io",
-    },
-    arb: {
-      network: "arbitrum",
-      rpc: "https://arb1.arbitrum.io/rpc",
-    },
-    degen: {
-      network: "degen",
-      rpc: "https://rpc.degen.tips",
-    },
-  };
   const networkList = Object.keys(networks);
 
   function isValidEVMAddress(address: string) {
@@ -242,6 +208,7 @@ function RegistForm() {
   const step1 = async () => {
     if (zoraUrl === "") {
       alert("Please input Zora URL");
+      return;
     }
     // バリデーションチェック
     let parts;
@@ -253,8 +220,9 @@ function RegistForm() {
       network = parts[4].split(":")[0];
       contractAddress = parts[4].split(":")[1];
       tokenId = parts[5];
-if(!tokenId)
-{tokenId="1"}
+      if (!tokenId) {
+        tokenId = "1";
+      }
       if (
         !networkList.includes(network) ||
         !isValidEVMAddress(contractAddress) ||
@@ -298,11 +266,78 @@ if(!tokenId)
     let ownerAddress;
     try {
       ownerAddress = await contract.owner();
+
+      // // Zoraのコントラクトならばコメントを取得
+      // const commentContract = new ethers.Contract(
+      //   networks[network as keyof typeof networks]["commentContract"],
+      //   ZoraCommentABI,
+      //   provider
+      // );
+
+      // // イベントフィルタを作成
+      // // const filter = {
+      // //   address: contractAddress,
+      // //   topics: [
+      // //     ethers.id("MintComment(address,address,uint256,uint256,string)"),
+      // //   ],
+      // // };
+      // // const filter = contract.filters.MintComment();
+
+      // // 最新のブロック番号を取得
+      // let latestBlock = await provider.getBlockNumber();
+
+      // // ブロック範囲をバッチサイズに分割
+      // const batchSize = 10000; // 適宜調整してください
+
+      // let allLogs: ethers.Log[] = [];
+
+      // // 0まで遡ると重いので100000までに制限
+      // // latestBlock = 12779099;
+      // for (let i = latestBlock; i >= 12778099; i -= batchSize) {
+      //   const fromBlock = Math.max(i - batchSize + 1, 0);
+      //   const toBlock = i;
+
+      //   // イベントを取得
+      //   const logs = await provider.getLogs({
+      //     // ...filter,
+      //     topics: [null, null, ethers.zeroPadValue(contractAddress, 32), null],
+      //     address:
+      //       networks[network as keyof typeof networks]["commentContract"],
+      //     fromBlock: fromBlock,
+      //     toBlock: toBlock,
+      //   });
+      //   // const logs = await contract.queryFilter(filter, fromBlock, toBlock);
+
+      //   console.log(fromBlock, toBlock);
+      //   console.log(logs);
+
+      //   if (logs.length > 0) {
+      //     allLogs = allLogs.concat(logs);
+
+      //     // コメントが10件以上取得できたら終了
+      //     if (allLogs.length >= 10) {
+      //       break;
+      //     }
+      //   }
+      // }
+
+      // console.log(allLogs);
+
+      // // コメントを配列に格納
+      // const comments = allLogs.map((log: any) => {
+      //   const event = commentContract.interface.parseLog(log);
+      //   console.log(event);
+      //   return event ? event.args.comment : "";
+      // });
+
+      // console.log(comments);
+
+      // コメントも取る
     } catch (e) {
       console.log(e);
       // ownerが取れなかったらコントラクトデプロイヤーを取得
-      const deployTransaction = await provider.getTransaction(contractAddress);
-      ownerAddress = deployTransaction?.from;
+      // const deployTransaction = await provider.getTransaction(contractAddress);
+      ownerAddress = data.contract.deployed_by;
 
       if (!ownerAddress) {
         alert("Can't get owner address");
@@ -386,12 +421,11 @@ if(!tokenId)
               Step 1: Input Zora URL
             </Label>
             <Input
+              key={zoraUrl}
               type="text"
               placeholder="https://zora.co/collect/zora:contractAddress/tokenId"
               value={zoraUrl}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setZoraUrl(e.target.value)
-              }
+              onChange={(e) => setZoraUrl(e.target.value)}
               className="w-full px-4 py-3 mb-4 text-sm border-2 border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent"
             />
             <div className="text-center space-x-4">
