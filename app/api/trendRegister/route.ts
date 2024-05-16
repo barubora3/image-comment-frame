@@ -45,7 +45,7 @@ export async function GET() {
     // data.TrendingMints.TrendingMint.forEach(async (trend: any) => {
 
     for (const trend of data.TrendingMints?.TrendingMint || []) {
-      const tokenId = trend.erc1155TokenID ? trend.erc1155TokenID : 1;
+      const tokenId = trend.erc1155TokenID ? trend.erc1155TokenID : "1";
       const contractAddress = trend.address;
       const key = chain + ":" + trend.address + ":" + tokenId;
       const dbRef = db.ref(key);
