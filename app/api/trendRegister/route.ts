@@ -56,8 +56,12 @@ export async function GET() {
         continue;
       }
 
-      console.log(process.env.NEXT_PUBLIC_SIWE_URI! + "/api/nftInfo");
       console.log(
+        "API URL:",
+        process.env.NEXT_PUBLIC_SIWE_URI! + "/api/nftInfo"
+      );
+      console.log(
+        "Request Body:",
         JSON.stringify({
           networkName: chain,
           contractAddress,
@@ -79,6 +83,17 @@ export async function GET() {
           }),
         }
       );
+
+      if (!response.ok) {
+        console.error(
+          "Failed to fetch from SIWE API:",
+          response.status,
+          response.statusText
+        );
+        const errorText = await response.text();
+        console.error("Error response text:", errorText);
+        continue;
+      }
 
       const data = await response.json();
       const name = data.name;
