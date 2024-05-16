@@ -10,10 +10,19 @@ export async function GET() {
 
     if (snapshot.exists()) {
       const data = snapshot.val();
-      const convertedData = Object.entries(data).map(([key, value]) => ({
+      let convertedData = Object.entries(data).map(([key, value]) => ({
         key,
         value,
       }));
+
+      // 登録順にソート
+      convertedData = convertedData.sort((a: any, b: any) => {
+        if (a.value.createAt < b.value.createAt) {
+          return 1;
+        } else {
+          return -1;
+        }
+      });
 
       return NextResponse.json({ data: convertedData }, { status: 200 });
     } else {
