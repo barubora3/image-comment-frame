@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
+  console.log("BBBBBB");
+  console.log(request.body);
   const { networkName, contractAddress, tokenId } = await request.json();
 
   console.log(
