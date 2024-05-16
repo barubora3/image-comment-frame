@@ -102,15 +102,13 @@ export async function GET() {
         comment: [],
       };
 
-      console.log(data);
-
       await dbRef.set(value);
       await createImage(key);
 
       // 通知投稿
       const url = "https://api.neynar.com/v2/farcaster/cast";
-      const text = `Today's trendhing mint.\n${name}`;
-      const embeds = process.env.NEXT_PUBLIC_SIWE_URI + "/api/" + key;
+      const text = `Today's trendhing mint!.\n${name}`;
+      const embeds = process.env.NEXT_PUBLIC_SIWE_URI + "api/" + key;
       const options = {
         method: "POST",
         headers: {
@@ -119,13 +117,18 @@ export async function GET() {
           "content-type": "application/json",
         },
         body: JSON.stringify({
+          signer_uuid: process.env.SIGNER_UUID,
           text: text,
           embeds: [{ url: embeds }],
           channel_id: "zora",
         }),
       };
 
-      fetch(url, options);
+      const postResponse = await fetch(url, options);
+
+      if (postResponse.status !== 200) {
+        return NextResponse.json({ message: "cast error" }, { status: 500 });
+      }
 
       // 1件登録したら終了
       return NextResponse.json(
