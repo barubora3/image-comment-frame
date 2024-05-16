@@ -57,7 +57,7 @@ export async function GET() {
       }
 
       const response = await fetch(
-        `https://api.simplehash.com/api/v0/nfts/${networkName}/${contractAddress}/${tokenId}`,
+        `https://api.simplehash.com/api/v0/nfts/${chain}/${contractAddress}/${tokenId}`,
         {
           method: "GET",
           headers: {
