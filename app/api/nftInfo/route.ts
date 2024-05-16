@@ -5,7 +5,10 @@ export async function POST(request: Request) {
   console.log("BBBBBB");
   let body: any;
   try {
-    body = await request.json();
+    const text = await request.text();
+    console.log("Raw request body:", text);
+
+    body = JSON.parse(text);
   } catch (error) {
     console.error("Failed to parse request body:", error);
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
