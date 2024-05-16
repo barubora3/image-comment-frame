@@ -56,44 +56,16 @@ export async function GET() {
         continue;
       }
 
-      console.log(
-        "API URL:",
-        process.env.NEXT_PUBLIC_SIWE_URI! + "/api/nftInfo"
-      );
-      console.log(
-        "Request Body:",
-        JSON.stringify({
-          networkName: chain,
-          contractAddress,
-          tokenId,
-        })
-      );
-
       const response = await fetch(
-        process.env.NEXT_PUBLIC_SIWE_URI! + "/api/nftInfo",
+        `https://api.simplehash.com/api/v0/nfts/${networkName}/${contractAddress}/${tokenId}`,
         {
-          method: "POST",
+          method: "GET",
           headers: {
-            "Content-Type": "application/json",
+            accept: "application/json",
+            "X-API-KEY": process.env.SIMPLE_HASH_API_KEY!,
           },
-          body: JSON.stringify({
-            networkName: chain,
-            contractAddress,
-            tokenId,
-          }),
         }
       );
-
-      if (!response.ok) {
-        console.error(
-          "Failed to fetch from SIWE API:",
-          response.status,
-          response.statusText
-        );
-        const errorText = await response.text();
-        console.error("Error response text:", errorText);
-        continue;
-      }
 
       const data = await response.json();
       const name = data.name;
