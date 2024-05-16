@@ -54,14 +54,14 @@ const app = new Frog({
   headers: {
     "cache-control": "max-age=0",
   },
-  // hub: {
-  //   apiUrl: "https://hubs.airstack.xyz",
-  //   fetchOptions: {
-  //     headers: {
-  //       "x-airstack-hubs": process.env.AIRSTACK_API_KEY!,
-  //     },
-  //   },
-  // },
+  hub: {
+    apiUrl: "https://hubs.airstack.xyz",
+    fetchOptions: {
+      headers: {
+        "x-airstack-hubs": process.env.AIRSTACK_API_KEY!,
+      },
+    },
+  },
 });
 
 // Uncomment to use Edge Runtime
@@ -133,7 +133,7 @@ app.frame("/:id", async (c) => {
     const displayName = userData.users[0].display_name;
     const userName = userData.users[0].username;
 
-    console.log(frameData?.timestamp);
+    // console.log(frameData?.timestamp);
     const commentObject = {
       message: inputText,
       left: Math.floor(Math.random() * 90),
@@ -147,7 +147,7 @@ app.frame("/:id", async (c) => {
         pfpUrl: pfpUrl,
       },
 
-      createAt: frameData?.timestamp,
+      createAt: Date.now(),
     };
 
     comment.push(commentObject);
