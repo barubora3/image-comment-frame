@@ -127,6 +127,15 @@ export async function GET() {
       const postResponse = await fetch(url, options);
 
       if (postResponse.status !== 200) {
+        console.log(process.env.NEYNAR_API_KEY!);
+        console.log(
+          JSON.stringify({
+            signer_uuid: process.env.SIGNER_UUID,
+            text: text,
+            embeds: [{ url: embeds }],
+            channel_id: "zora",
+          })
+        );
         return NextResponse.json({ message: "cast error" }, { status: 500 });
       }
 
