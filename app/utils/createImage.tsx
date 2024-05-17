@@ -2,10 +2,13 @@ import { db, storage } from "@/lib/firebase";
 import { ImageResponse } from "next/og";
 import { textOutlineStyle, textColorCodes, textSizes } from "./text";
 
-export async function createImage(key: string) {
+export async function createImage(key: string, waitTime: number = 0) {
   try {
     if (!key) {
       throw new Error("Missing 'key' parameter");
+    }
+    if (waitTime > 0) {
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
 
     const dbRef = db.ref(key);

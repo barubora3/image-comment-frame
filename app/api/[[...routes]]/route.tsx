@@ -54,6 +54,7 @@ const app = new Frog({
   headers: {
     "cache-control": "max-age=0",
   },
+  browserLocation: "/",
   hub: {
     apiUrl: "https://hubs.airstack.xyz",
     fetchOptions: {
@@ -154,7 +155,7 @@ app.frame("/:id", async (c) => {
     await dbRef.update({ comment });
 
     // image upload
-    createImage(id);
+    createImage(id, 1000);
   }
 
   if (buttonValue === "noComment") {
@@ -165,6 +166,7 @@ app.frame("/:id", async (c) => {
 
   const imageUrl = getImageUrl(id);
   return c.res({
+    browserLocation: "/comment/" + id,
     image: imageUrl,
     // (
     // <Box grow alignHorizontal="center">
