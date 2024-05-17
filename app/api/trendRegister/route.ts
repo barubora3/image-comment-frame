@@ -31,7 +31,10 @@ let variables = {
   criteria: "unique_wallets",
 };
 
-const chains = ["base", "degen"];
+const chains = [
+  "base",
+  //  "degen"
+];
 
 export async function GET() {
   for (const chain of chains) {
