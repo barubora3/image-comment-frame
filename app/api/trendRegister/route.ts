@@ -50,6 +50,7 @@ export async function GET() {
     for (const trend of data.TrendingMints?.TrendingMint || []) {
       const tokenId = trend.erc1155TokenID ? trend.erc1155TokenID : "1";
       const contractAddress = trend.address;
+      const count = trend.criteriaCount;
       const key = chain + ":" + trend.address + ":" + tokenId;
       const dbRef = db.ref(key);
       const snapshot = await dbRef.get();
@@ -110,7 +111,8 @@ export async function GET() {
 
       // 通知投稿
       const url = "https://api.neynar.com/v2/farcaster/cast";
-      const text = `Today's trendhing mint!.\n${name}`;
+      const text = `Best of mint on Base today🏆 👀.\n${name}\n${count} minted in the last 8 hours\n\nJoin /degen-comment to be the first to know.`;
+
       const embeds = process.env.NEXT_PUBLIC_SIWE_URI + "api/" + key;
       const options = {
         method: "POST",
