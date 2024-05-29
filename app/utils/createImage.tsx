@@ -16,6 +16,7 @@ export async function createImage(key: string, waitTime: number = 0) {
     const data = await snapshot.val();
 
     if (!data) {
+      console.log("Data not found");
       throw new Error("Data not found");
     }
 
@@ -92,6 +93,8 @@ export async function createImage(key: string, waitTime: number = 0) {
       }
     );
 
+    console.log("Image created");
+
     const blob = await image.blob();
     const metadata = {
       contentType: blob.type,
@@ -100,6 +103,7 @@ export async function createImage(key: string, waitTime: number = 0) {
     const fileName = `${key}.png`;
     const filePath = `images/${fileName}`;
 
+    console.log("START UPLOAD IMAGE");
     const storageSnapshot = await storage
       .file(filePath)
       .save(blob.stream(), { metadata });
