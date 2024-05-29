@@ -96,6 +96,10 @@ export async function createImage(key: string, waitTime: number = 0) {
     console.log("Image created");
 
     const blob = await image.blob();
+    console.log("Blob generated:", blob);
+    const stream = blob.stream();
+    console.log("Blob stream generated:", stream);
+
     const metadata = {
       contentType: blob.type,
     };
