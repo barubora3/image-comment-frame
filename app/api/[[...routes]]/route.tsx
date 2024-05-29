@@ -16,10 +16,10 @@ import {
 } from "../../utils/text";
 import { getImageUrl, getZoraUrl } from "../../utils/url";
 import { createImage } from "../../utils/createImage";
-const options = {
-  method: "GET",
-  headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
-};
+// const options = {
+//   method: "GET",
+//   headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY! },
+// };
 
 const { Box, Image, VStack, Heading, Text } = createSystem({
   colors: {
@@ -73,6 +73,44 @@ app.frame("/:id", async (c) => {
 
   const id = req.param("id");
 
+  if (inputText && buttonValue === "doComment") {
+    // console.time("frame get data");
+    // const userInfo = await fetch(
+    //   `https://api.neynar.com/v2/farcaster/user/bulk?fids=${frameData?.fid}&viewer_fid=3`,
+    //   options
+    // );
+    // const userData = await userInfo.json();
+    // const pfpUrl = userData.users[0].pfp_url;
+    // const displayName = userData.users[0].display_name;
+    // const userName = userData.users[0].username;
+    // console.timeEnd("frame get data");
+
+    const response = fetch(
+      `${process.env.NEXT_PUBLIC_SIWE_URI}api/addComment`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          comment: inputText,
+          key: id,
+          fid: frameData?.fid,
+        }),
+      }
+    );
+
+    return c.res({
+      image: process.env.NEXT_PUBLIC_SIWE_URI + "loading.gif",
+      intents: [
+        <Button key="refresh" value="refresh">
+          Refresh
+        </Button>,
+      ],
+    });
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
   const dbRef = db.ref(id);
   const snapshot = await dbRef.get();
 
@@ -123,58 +161,6 @@ app.frame("/:id", async (c) => {
   const image = data.image;
   const name = data.name;
   let comment = data.comment || [];
-
-  if (inputText && buttonValue === "doComment") {
-    const userInfo = await fetch(
-      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${frameData?.fid}&viewer_fid=3`,
-      options
-    );
-    const userData = await userInfo.json();
-    const pfpUrl = userData.users[0].pfp_url;
-    const displayName = userData.users[0].display_name;
-    const userName = userData.users[0].username;
-
-    // console.log(frameData?.timestamp);
-    // const commentObject = {
-    //   message: inputText,
-    //   left: Math.floor(Math.random() * 90),
-    //   top: Math.floor(Math.random() * 90),
-    //   color: textColors[Math.floor(Math.random() * textColors.length)],
-    //   size: textSizes,
-    //   profile: {
-    //     fid: frameData?.fid,
-    //     displayName: displayName,
-    //     userName: userName,
-    //     pfpUrl: pfpUrl,
-    //   },
-
-    //   createAt: Date.now(),
-    // };
-
-    // comment.push(commentObject);
-    // await dbRef.update({ comment });
-
-    // image upload
-    // createImage(id, 1000);
-
-    // frameの5秒タイムアウトがあるため、コメントの追加は別APIを投げっぱなしで行う
-    const response = fetch(`/api/addComment`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        comment: inputText,
-        key: id,
-        profile: {
-          fid: frameData?.fid,
-          displayName: displayName,
-          pfpUrl: pfpUrl,
-          userName: userName,
-        },
-      }),
-    });
-  }
 
   if (buttonValue === "noComment") {
     comment = [];

@@ -4,13 +4,20 @@ import { textColors, textSizes } from "../../utils/text";
 import { createImage } from "../../utils/createImage";
 
 export async function POST(req: Request) {
-  const {
+  console.time("addComment");
+  let {
     comment: newComment,
     key,
     profile,
-  } = (await req.json()) as { comment: string; key: string; profile: any };
+    fid,
+  } = (await req.json()) as {
+    comment: string;
+    key: string;
+    profile?: any;
+    fid?: string;
+  };
 
-  if (!newComment || !key || !profile) {
+  if (!newComment || !key || (!profile && !fid)) {
     console.log("Missing 'comment' or 'key' or 'profile' parameter");
     return NextResponse.json(
       { error: "Missing 'comment' or 'key' or 'profile' parameter" },
@@ -18,11 +25,38 @@ export async function POST(req: Request) {
     );
   }
 
+  if (!profile && fid) {
+    console.time("frame get data");
+    const options = {
+      method: "GET",
+      headers: {
+        accept: "application/json",
+        api_key: process.env.NEYNAR_API_KEY!,
+      },
+    };
+    const userInfo = await fetch(
+      `https://api.neynar.com/v2/farcaster/user/bulk?fids=${fid}&viewer_fid=3`,
+      options
+    );
+    const userData = await userInfo.json();
+    const pfpUrl = userData.users[0].pfp_url;
+    const displayName = userData.users[0].display_name;
+    const userName = userData.users[0].username;
+    console.timeEnd("frame get data");
+
+    profile = {
+      fid: fid,
+      displayName: displayName,
+      pfpUrl: pfpUrl,
+      userName: userName,
+    };
+  }
+
   const dbRef = db.ref(key);
   const snapshot = await dbRef.get();
   const data = await snapshot.val();
   let comment = data.comment || [];
-  console.log("comment", comment);
+  // console.log("comment", comment);
 
   const now = new Date();
   const unixTimeMs = now.getTime();
@@ -42,9 +76,11 @@ export async function POST(req: Request) {
   await dbRef.update({ comment });
 
   // 画像生成して完了するまで待機
-  // ただしコメント数が多くなるとタイムアウトが発生する可能性があるため、固定時間待機する
+  console.time("createImage");
   await createImage(key);
+  console.timeEnd("createImage");
   // await new Promise((resolve) => setTimeout(resolve, 3000));
+  console.timeEnd("addComment");
 
   return NextResponse.json({ message: "Comment complete !" }, { status: 200 });
 }
