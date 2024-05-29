@@ -135,27 +135,45 @@ app.frame("/:id", async (c) => {
     const userName = userData.users[0].username;
 
     // console.log(frameData?.timestamp);
-    const commentObject = {
-      message: inputText,
-      left: Math.floor(Math.random() * 90),
-      top: Math.floor(Math.random() * 90),
-      color: textColors[Math.floor(Math.random() * textColors.length)],
-      size: textSizes,
-      profile: {
-        fid: frameData?.fid,
-        displayName: displayName,
-        userName: userName,
-        pfpUrl: pfpUrl,
-      },
+    // const commentObject = {
+    //   message: inputText,
+    //   left: Math.floor(Math.random() * 90),
+    //   top: Math.floor(Math.random() * 90),
+    //   color: textColors[Math.floor(Math.random() * textColors.length)],
+    //   size: textSizes,
+    //   profile: {
+    //     fid: frameData?.fid,
+    //     displayName: displayName,
+    //     userName: userName,
+    //     pfpUrl: pfpUrl,
+    //   },
 
-      createAt: Date.now(),
-    };
+    //   createAt: Date.now(),
+    // };
 
-    comment.push(commentObject);
-    await dbRef.update({ comment });
+    // comment.push(commentObject);
+    // await dbRef.update({ comment });
 
     // image upload
-    createImage(id, 1000);
+    // createImage(id, 1000);
+
+    // frameの5秒タイムアウトがあるため、コメントの追加は別APIを投げっぱなしで行う
+    const response = fetch(`/api/addComment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        comment: inputText,
+        key: id,
+        profile: {
+          fid: frameData?.fid,
+          displayName: displayName,
+          pfpUrl: pfpUrl,
+          userName: userName,
+        },
+      }),
+    });
   }
 
   if (buttonValue === "noComment") {
